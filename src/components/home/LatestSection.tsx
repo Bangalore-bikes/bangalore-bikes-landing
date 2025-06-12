@@ -1,42 +1,51 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Users, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, MapPin, Users, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 const latestRides = [
   {
-    title: 'Nandi Hills Sunrise Ride',
-    date: '2024-01-15',
-    meetingPoint: 'Hebbal Flyover',
+    title: "Nandi Hills Sunrise Ride",
+    date: "2024-01-15",
+    meetingPoint: "Hebbal Flyover",
     participants: 25,
-    image: 'https://images.pexels.com/photos/1119796/pexels-photo-1119796.jpeg',
-    status: 'upcoming',
+    image: "https://images.pexels.com/photos/1119796/pexels-photo-1119796.jpeg",
+    status: "upcoming",
   },
   {
-    title: 'Coorg Coffee Trail',
-    date: '2024-01-22',
-    meetingPoint: 'Electronic City',
+    title: "Coorg Coffee Trail",
+    date: "2024-01-22",
+    meetingPoint: "Electronic City",
     participants: 18,
-    image: 'https://images.pexels.com/photos/2116475/pexels-photo-2116475.jpeg',
-    status: 'upcoming',
+    image: "https://images.pexels.com/photos/2116475/pexels-photo-2116475.jpeg",
+    status: "upcoming",
   },
 ];
 
 const latestBlogs = [
   {
-    title: 'Essential Tools Every Royal Enfield Owner Should Have',
-    excerpt: 'A comprehensive guide to building your motorcycle toolkit for basic maintenance and emergency repairs.',
-    date: '2024-01-10',
-    readTime: '5 min read',
-    image: 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg',
+    title: "Essential Tools Every Royal Enfield Owner Should Have",
+    excerpt:
+      "A comprehensive guide to building your motorcycle toolkit for basic maintenance and emergency repairs.",
+    date: "2024-01-10",
+    readTime: "5 min read",
+    image:
+      "https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg",
   },
   {
-    title: 'Best Routes Around Bangalore for Weekend Rides',
-    excerpt: 'Discover scenic routes perfect for day trips from Bangalore, complete with fuel stops and photo spots.',
-    date: '2024-01-08',
-    readTime: '8 min read',
-    image: 'https://images.pexels.com/photos/1119796/pexels-photo-1119796.jpeg',
+    title: "Best Routes Around Bangalore for Weekend Rides",
+    excerpt:
+      "Discover scenic routes perfect for day trips from Bangalore, complete with fuel stops and photo spots.",
+    date: "2024-01-08",
+    readTime: "8 min read",
+    image: "https://images.pexels.com/photos/1119796/pexels-photo-1119796.jpeg",
   },
 ];
 
@@ -62,7 +71,10 @@ export default function LatestSection() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {latestRides.map((ride, index) => (
-              <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <Card
+                key={index}
+                className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              >
                 <div className="relative h-48">
                   <div
                     className="w-full h-full bg-cover bg-center"
@@ -83,11 +95,11 @@ export default function LatestSection() {
                   <div className="space-y-2 text-sm text-gray-600 mb-4">
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2" />
-                      {new Date(ride.date).toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
+                      {new Date(ride.date).toLocaleDateString("en-US", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
                       })}
                     </div>
                     <div className="flex items-center">
@@ -115,7 +127,9 @@ export default function LatestSection() {
               <h2 className="font-display text-3xl font-bold text-[var(--bb-navy)] mb-2">
                 Latest from Blog
               </h2>
-              <p className="text-gray-600">Tips, stories, and insights from the community</p>
+              <p className="text-gray-600">
+                Tips, stories, and insights from the community
+              </p>
             </div>
             <Button variant="outline" asChild>
               <Link href="/blogs">
@@ -126,7 +140,10 @@ export default function LatestSection() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {latestBlogs.map((post, index) => (
-              <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <Card
+                key={index}
+                className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              >
                 <div className="relative h-48">
                   <div
                     className="w-full h-full bg-cover bg-center"
@@ -150,7 +167,10 @@ export default function LatestSection() {
                   <CardDescription className="text-gray-600 mb-4 leading-relaxed">
                     {post.excerpt}
                   </CardDescription>
-                  <Button variant="outline" className="hover:bg-[var(--bb-gold)] hover:text-white hover:border-[var(--bb-gold)]">
+                  <Button
+                    variant="outline"
+                    className="hover:bg-[var(--bb-gold)] hover:text-white hover:border-[var(--bb-gold)]"
+                  >
                     Read More
                   </Button>
                 </CardContent>

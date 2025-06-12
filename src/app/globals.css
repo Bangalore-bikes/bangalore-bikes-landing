@@ -1,26 +1,115 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Custom variants using the new v4 syntax */
+@variant dark (&:is(.dark *));
+@variant light (&:is(:not(.dark) *));
+@variant light-dark (&:is(.dark, :not(.dark) *));
+@variant light-dark-contrast (&:is(.dark, :not(.dark) *):not([data-theme='dark']));
+@variant light-dark-contrast-invert (&:is(.dark, :not(.dark) *):not([data-theme='light']));
+
+/* Theme configuration using @theme directive */
+@theme {
+  /* Color tokens */
+  --color-bb-blue: #3A5AFF;
+  --color-bb-black: #0A0D14;
+  --color-bb-gray: #2D2F3A;
+  --color-bb-crimson: #E94560;
+
+  /* Background colors */
+  --color-background: 10 13 20;
+  --color-foreground: 255 255 255;
+
+  /* Card colors */
+  --color-card: 45 47 58;
+  --color-card-foreground: 255 255 255;
+
+  /* Popover colors */
+  --color-popover: 45 47 58;
+  --color-popover-foreground: 255 255 255;
+
+  /* Primary colors */
+  --color-primary: 58 90 255;
+  --color-primary-foreground: 255 255 255;
+
+  /* Secondary colors */
+  --color-secondary: 45 47 58;
+  --color-secondary-foreground: 255 255 255;
+
+  /* Muted colors */
+  --color-muted: 160 167 178;
+  --color-muted-foreground: 200 210 220;
+
+  /* Accent colors */
+  --color-accent: 58 90 255;
+  --color-accent-foreground: 255 255 255;
+
+  /* Destructive colors */
+  --color-destructive: 233 69 96;
+  --color-destructive-foreground: 255 255 255;
+
+  /* Border and input colors */
+  --color-border: 45 47 58;
+  --color-input: 45 47 58;
+  --color-ring: 58 90 255;
+
+  /* Border radius */
+  --radius: 0.5rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Legacy CSS variables for compatibility */
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+
+  /* New BB Community Colors */
+  --bb-blue: #3A5AFF;
+  --bb-black: #0A0D14;
+  --bb-gray: #2D2F3A;
+  --bb-crimson: #E94560;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
   }
 }
 
+/* Base styles using @utility directive */
+@utility border-default {
+  border-color: theme(--color-border);
+}
+
+/* Body styles */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: theme(--color-background);
+  color: theme(--color-foreground);
+}
+
+/* Custom component utilities */
+@utility bb-gradient {
+  background: linear-gradient(135deg, var(--bb-black) 0%, var(--bb-gray) 100%);
+}
+
+@utility bb-blue-gradient {
+  background: linear-gradient(135deg, var(--bb-blue) 0%, var(--bb-gray) 100%);
+}
+
+@utility bb-text-gradient {
+  background: linear-gradient(135deg, var(--bb-blue) 0%, var(--bb-crimson) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@utility bb-hero-pattern {
+  background-image:
+    radial-gradient(circle at 25% 25%, rgba(58, 90, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(233, 69, 96, 0.1) 0%, transparent 50%);
+}
+
+@utility font-display {
+  font-family: var(--font-playfair);
 }

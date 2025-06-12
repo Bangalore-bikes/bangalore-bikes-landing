@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Play, Users, MapPin, Wrench } from 'lucide-react';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Play, Users, MapPin, Wrench } from "lucide-react";
+import Link from "next/link";
 
 const heroImages = [
-  'https://images.pexels.com/photos/2116475/pexels-photo-2116475.jpeg',
-  'https://images.pexels.com/photos/1119796/pexels-photo-1119796.jpeg',
-  'https://images.pexels.com/photos/2116469/pexels-photo-2116469.jpeg',
+  "https://images.pexels.com/photos/2116475/pexels-photo-2116475.jpeg",
+  "https://images.pexels.com/photos/1119796/pexels-photo-1119796.jpeg",
+  "https://images.pexels.com/photos/2116469/pexels-photo-2116469.jpeg",
 ];
 
 export default function HeroSection() {
@@ -29,7 +29,7 @@ export default function HeroSection() {
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentImage ? 'opacity-100' : 'opacity-0'
+              index === currentImage ? "opacity-100" : "opacity-0"
             }`}
           >
             <div
@@ -45,17 +45,17 @@ export default function HeroSection() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-            Welcome to{' '}
-            <span className="bb-text-gradient">Bangalore Bikes</span>
+            Welcome to <span className="bb-text-gradient">Bangalore Bikes</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-200 mb-8 leading-relaxed">
-            Your ultimate destination for Royal Enfield maintenance, epic rides, and a thriving motorcycle community in the Silicon Valley of India.
+            Your ultimate destination for Royal Enfield maintenance, epic rides,
+            and a thriving motorcycle community in the Silicon Valley of India.
           </p>
-          
+
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="bb-gold-gradient text-white hover:opacity-90 transition-opacity text-lg px-8 py-4"
               asChild
             >
@@ -63,9 +63,9 @@ export default function HeroSection() {
                 Explore Rides <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
+            <Button
+              size="lg"
+              variant="outline"
               className="border-white text-white hover:bg-white hover:text-[var(--bb-navy)] text-lg px-8 py-4"
               asChild
             >

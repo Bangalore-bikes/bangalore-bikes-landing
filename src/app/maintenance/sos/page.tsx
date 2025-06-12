@@ -1,82 +1,106 @@
 "use client";
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Phone, MapPin, Clock, AlertTriangle, Shield, Wrench, Fuel } from 'lucide-react';
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Phone,
+  MapPin,
+  Clock,
+  AlertTriangle,
+  Shield,
+  Wrench,
+  Fuel,
+} from "lucide-react";
 
 const emergencyContacts = [
   {
-    name: 'Bangalore Bikes Emergency Hotline',
-    number: '+91 98765 43210',
-    available: '24/7',
-    coverage: 'Bangalore & 50km radius',
-    services: ['Breakdown Assistance', 'Towing', 'Minor Repairs', 'Fuel Delivery'],
+    name: "Bangalore Bikes Emergency Hotline",
+    number: "+91 98765 43210",
+    available: "24/7",
+    coverage: "Bangalore & 50km radius",
+    services: [
+      "Breakdown Assistance",
+      "Towing",
+      "Minor Repairs",
+      "Fuel Delivery",
+    ],
     primary: true,
   },
   {
-    name: 'Royal Enfield Roadside Assistance',
-    number: '1800-210-0007',
-    available: '24/7',
-    coverage: 'Pan India',
-    services: ['Official RSA', 'Warranty Claims', 'Genuine Parts', 'Authorized Service'],
+    name: "Royal Enfield Roadside Assistance",
+    number: "1800-210-0007",
+    available: "24/7",
+    coverage: "Pan India",
+    services: [
+      "Official RSA",
+      "Warranty Claims",
+      "Genuine Parts",
+      "Authorized Service",
+    ],
     primary: false,
   },
   {
-    name: 'Karnataka State Police Highway Patrol',
-    number: '100',
-    available: '24/7',
-    coverage: 'Karnataka Highways',
-    services: ['Emergency Response', 'Traffic Assistance', 'Safety Support'],
+    name: "Karnataka State Police Highway Patrol",
+    number: "100",
+    available: "24/7",
+    coverage: "Karnataka Highways",
+    services: ["Emergency Response", "Traffic Assistance", "Safety Support"],
     primary: false,
   },
 ];
 
 const commonIssues = [
   {
-    issue: 'Engine Won\'t Start',
+    issue: "Engine Won't Start",
     icon: Wrench,
     quickFixes: [
-      'Check fuel level and reserve',
-      'Ensure kill switch is OFF',
-      'Check if bike is in neutral',
-      'Try kick-starting if electric start fails',
+      "Check fuel level and reserve",
+      "Ensure kill switch is OFF",
+      "Check if bike is in neutral",
+      "Try kick-starting if electric start fails",
     ],
-    whenToCall: 'If engine still won\'t start after basic checks',
+    whenToCall: "If engine still won't start after basic checks",
   },
   {
-    issue: 'Flat Tire',
+    issue: "Flat Tire",
     icon: AlertTriangle,
     quickFixes: [
-      'Move to safe location away from traffic',
-      'Use puncture repair kit if available',
-      'Check spare tube if you carry one',
-      'Locate nearest tire shop',
+      "Move to safe location away from traffic",
+      "Use puncture repair kit if available",
+      "Check spare tube if you carry one",
+      "Locate nearest tire shop",
     ],
-    whenToCall: 'If you don\'t have repair tools or spare tube',
+    whenToCall: "If you don't have repair tools or spare tube",
   },
   {
-    issue: 'Out of Fuel',
+    issue: "Out of Fuel",
     icon: Fuel,
     quickFixes: [
-      'Switch to reserve tank',
-      'Locate nearest fuel station',
-      'Ask fellow riders for emergency fuel',
-      'Use fuel delivery apps if available',
+      "Switch to reserve tank",
+      "Locate nearest fuel station",
+      "Ask fellow riders for emergency fuel",
+      "Use fuel delivery apps if available",
     ],
-    whenToCall: 'If stranded with no fuel stations nearby',
+    whenToCall: "If stranded with no fuel stations nearby",
   },
   {
-    issue: 'Electrical Problems',
+    issue: "Electrical Problems",
     icon: Shield,
     quickFixes: [
-      'Check battery connections',
-      'Look for loose wires',
-      'Try bump starting if possible',
-      'Check fuses if you have spares',
+      "Check battery connections",
+      "Look for loose wires",
+      "Try bump starting if possible",
+      "Check fuses if you have spares",
     ],
-    whenToCall: 'For complex electrical issues or if bike won\'t start',
+    whenToCall: "For complex electrical issues or if bike won't start",
   },
 ];
 
@@ -93,7 +117,8 @@ export default function SOSPage() {
               SOS & Roadside Assistance
             </h1>
             <p className="text-xl text-gray-200 mb-8">
-              24/7 emergency support when you need it most. We&apos;ve got your back on every ride.
+              24/7 emergency support when you need it most. We&apos;ve got your
+              back on every ride.
             </p>
           </div>
         </div>
@@ -105,9 +130,12 @@ export default function SOSPage() {
           <Alert className="border-red-200 bg-red-50">
             <AlertTriangle className="h-5 w-5 text-red-600" />
             <AlertDescription className="text-red-800">
-              <strong>In case of medical emergency, always call 108 (Ambulance) first.</strong>
+              <strong>
+                In case of medical emergency, always call 108 (Ambulance) first.
+              </strong>
               <br />
-              For road accidents involving injuries, call 100 (Police) immediately.
+              For road accidents involving injuries, call 100 (Police)
+              immediately.
             </AlertDescription>
           </Alert>
         </div>
@@ -127,7 +155,10 @@ export default function SOSPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {emergencyContacts.map((contact, index) => (
-              <Card key={index} className={`hover:shadow-lg transition-shadow duration-300 ${contact.primary ? 'ring-2 ring-[var(--bb-gold)] ring-opacity-50' : ''}`}>
+              <Card
+                key={index}
+                className={`hover:shadow-lg transition-shadow duration-300 ${contact.primary ? "ring-2 ring-[var(--bb-gold)] ring-opacity-50" : ""}`}
+              >
                 <CardHeader className="text-center">
                   {contact.primary && (
                     <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-[var(--bb-gold)] text-white text-xs font-semibold mb-2">
@@ -156,7 +187,9 @@ export default function SOSPage() {
                   </div>
 
                   <div className="mb-6">
-                    <h4 className="font-semibold text-gray-700 mb-2">Services:</h4>
+                    <h4 className="font-semibold text-gray-700 mb-2">
+                      Services:
+                    </h4>
                     <ul className="text-sm text-gray-600 space-y-1">
                       {contact.services.map((service, serviceIndex) => (
                         <li key={serviceIndex}>• {service}</li>
@@ -165,7 +198,7 @@ export default function SOSPage() {
                   </div>
 
                   <Button
-                    className={`w-full ${contact.primary ? 'bb-gold-gradient text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'}`}
+                    className={`w-full ${contact.primary ? "bb-gold-gradient text-white" : "bg-gray-600 hover:bg-gray-700 text-white"}`}
                     onClick={() => window.open(`tel:${contact.number}`)}
                   >
                     <Phone className="mr-2 h-4 w-4" />
@@ -192,7 +225,10 @@ export default function SOSPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {commonIssues.map((item, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
+              <Card
+                key={index}
+                className="hover:shadow-lg transition-shadow duration-300"
+              >
                 <CardHeader>
                   <div className="flex items-center space-x-3 mb-2">
                     <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-red-100">
@@ -205,7 +241,9 @@ export default function SOSPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="mb-4">
-                    <h4 className="font-semibold text-gray-700 mb-2">Quick Fixes:</h4>
+                    <h4 className="font-semibold text-gray-700 mb-2">
+                      Quick Fixes:
+                    </h4>
                     <ul className="space-y-1 text-sm text-gray-600">
                       {item.quickFixes.map((fix, fixIndex) => (
                         <li key={fixIndex} className="flex items-start">
@@ -241,42 +279,56 @@ export default function SOSPage() {
             <div className="bg-blue-50 p-6 rounded-lg">
               <h3 className="font-semibold text-blue-900 mb-2">Stay Visible</h3>
               <p className="text-blue-800 text-sm">
-                Move your bike to the side of the road, turn on hazard lights, and wear reflective gear if available.
+                Move your bike to the side of the road, turn on hazard lights,
+                and wear reflective gear if available.
               </p>
             </div>
 
             <div className="bg-green-50 p-6 rounded-lg">
-              <h3 className="font-semibold text-green-900 mb-2">Share Location</h3>
+              <h3 className="font-semibold text-green-900 mb-2">
+                Share Location
+              </h3>
               <p className="text-green-800 text-sm">
-                Always share your exact location when calling for help. Use GPS coordinates if possible.
+                Always share your exact location when calling for help. Use GPS
+                coordinates if possible.
               </p>
             </div>
 
             <div className="bg-purple-50 p-6 rounded-lg">
               <h3 className="font-semibold text-purple-900 mb-2">Stay Calm</h3>
               <p className="text-purple-800 text-sm">
-                Keep calm, assess the situation, and don't attempt repairs you're not confident about.
+                Keep calm, assess the situation, and don't attempt repairs
+                you're not confident about.
               </p>
             </div>
 
             <div className="bg-orange-50 p-6 rounded-lg">
-              <h3 className="font-semibold text-orange-900 mb-2">Emergency Kit</h3>
+              <h3 className="font-semibold text-orange-900 mb-2">
+                Emergency Kit
+              </h3>
               <p className="text-orange-800 text-sm">
-                Carry basic tools, first aid kit, flashlight, and emergency contact numbers.
+                Carry basic tools, first aid kit, flashlight, and emergency
+                contact numbers.
               </p>
             </div>
 
             <div className="bg-red-50 p-6 rounded-lg">
-              <h3 className="font-semibold text-red-900 mb-2">Weather Awareness</h3>
+              <h3 className="font-semibold text-red-900 mb-2">
+                Weather Awareness
+              </h3>
               <p className="text-red-800 text-sm">
-                In bad weather, prioritize safety over speed. Seek shelter if conditions are dangerous.
+                In bad weather, prioritize safety over speed. Seek shelter if
+                conditions are dangerous.
               </p>
             </div>
 
             <div className="bg-gray-50 p-6 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-2">Communication</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Communication
+              </h3>
               <p className="text-gray-800 text-sm">
-                Keep your phone charged and inform someone about your travel plans and expected arrival.
+                Keep your phone charged and inform someone about your travel
+                plans and expected arrival.
               </p>
             </div>
           </div>

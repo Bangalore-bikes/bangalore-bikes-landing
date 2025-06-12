@@ -1,28 +1,50 @@
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Wrench, MapPin, Phone, ArrowRight, CheckCircle } from 'lucide-react';
-import Link from 'next/link';
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Wrench, MapPin, Phone, ArrowRight, CheckCircle } from "lucide-react";
+import Link from "next/link";
 
 const maintenanceCategories = [
   {
-    title: 'Basic Checks',
-    description: 'Daily and weekly maintenance routines',
-    guides: ['Engine Oil Check', 'Tire Pressure', 'Chain Tension', 'Brake Fluid'],
-    image: 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg',
+    title: "Basic Checks",
+    description: "Daily and weekly maintenance routines",
+    guides: [
+      "Engine Oil Check",
+      "Tire Pressure",
+      "Chain Tension",
+      "Brake Fluid",
+    ],
+    image:
+      "https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg",
   },
   {
-    title: 'Periodic Maintenance',
-    description: 'Monthly and seasonal maintenance tasks',
-    guides: ['Oil Change', 'Air Filter Cleaning', 'Spark Plug Replacement', 'Chain Lubrication'],
-    image: 'https://images.pexels.com/photos/3806288/pexels-photo-3806288.jpeg',
+    title: "Periodic Maintenance",
+    description: "Monthly and seasonal maintenance tasks",
+    guides: [
+      "Oil Change",
+      "Air Filter Cleaning",
+      "Spark Plug Replacement",
+      "Chain Lubrication",
+    ],
+    image: "https://images.pexels.com/photos/3806288/pexels-photo-3806288.jpeg",
   },
   {
-    title: 'Troubleshooting',
-    description: 'Common issues and their solutions',
-    guides: ['Starting Problems', 'Engine Noise', 'Electrical Issues', 'Carburetor Tuning'],
-    image: 'https://images.pexels.com/photos/4489702/pexels-photo-4489702.jpeg',
+    title: "Troubleshooting",
+    description: "Common issues and their solutions",
+    guides: [
+      "Starting Problems",
+      "Engine Noise",
+      "Electrical Issues",
+      "Carburetor Tuning",
+    ],
+    image: "https://images.pexels.com/photos/4489702/pexels-photo-4489702.jpeg",
   },
 ];
 
@@ -30,7 +52,7 @@ export default function MaintenancePage() {
   return (
     <main>
       <Header />
-      
+
       {/* Hero Section */}
       <section className="bb-gradient text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,7 +61,8 @@ export default function MaintenancePage() {
               Knowledge & Maintenance Hub
             </h1>
             <p className="text-xl text-gray-200 mb-8">
-              Everything you need to keep your Royal Enfield running smoothly. From DIY guides to professional support.
+              Everything you need to keep your Royal Enfield running smoothly.
+              From DIY guides to professional support.
             </p>
           </div>
         </div>
@@ -86,10 +109,11 @@ export default function MaintenancePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
-                <Button className="w-full bb-gold-gradient text-white mb-4" asChild>
-                  <Link href="/maintenance/garages">
-                    Find Garages
-                  </Link>
+                <Button
+                  className="w-full bb-gold-gradient text-white mb-4"
+                  asChild
+                >
+                  <Link href="/maintenance/garages">Find Garages</Link>
                 </Button>
                 <p className="text-sm text-gray-600">
                   25+ verified service centers
@@ -111,10 +135,11 @@ export default function MaintenancePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
-                <Button className="w-full bb-gold-gradient text-white mb-4" asChild>
-                  <Link href="/maintenance/sos">
-                    Emergency Contacts
-                  </Link>
+                <Button
+                  className="w-full bb-gold-gradient text-white mb-4"
+                  asChild
+                >
+                  <Link href="/maintenance/sos">Emergency Contacts</Link>
                 </Button>
                 <p className="text-sm text-gray-600">
                   Available 24/7 across Karnataka
@@ -133,13 +158,17 @@ export default function MaintenancePage() {
               DIY Maintenance Categories
             </h2>
             <p className="text-xl text-gray-600">
-              Master your Royal Enfield maintenance with our comprehensive guides
+              Master your Royal Enfield maintenance with our comprehensive
+              guides
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {maintenanceCategories.map((category, index) => (
-              <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <Card
+                key={index}
+                className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              >
                 <div className="relative h-48">
                   <div
                     className="w-full h-full bg-cover bg-center"
@@ -151,20 +180,24 @@ export default function MaintenancePage() {
                   <CardTitle className="text-xl text-[var(--bb-navy)]">
                     {category.title}
                   </CardTitle>
-                  <CardDescription>
-                    {category.description}
-                  </CardDescription>
+                  <CardDescription>{category.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 mb-6">
                     {category.guides.map((guide, guideIndex) => (
-                      <li key={guideIndex} className="flex items-center text-sm text-gray-600">
+                      <li
+                        key={guideIndex}
+                        className="flex items-center text-sm text-gray-600"
+                      >
                         <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
                         {guide}
                       </li>
                     ))}
                   </ul>
-                  <Button variant="outline" className="w-full hover:bg-[var(--bb-gold)] hover:text-white hover:border-[var(--bb-gold)]">
+                  <Button
+                    variant="outline"
+                    className="w-full hover:bg-[var(--bb-gold)] hover:text-white hover:border-[var(--bb-gold)]"
+                  >
                     View Guides <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </CardContent>

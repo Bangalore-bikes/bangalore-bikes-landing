@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Menu, X, Phone, Mail } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Menu, X, Phone, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const navigation = [
-  { name: 'Home', href: '/' },
-  { name: 'Knowledge & Maintenance', href: '/maintenance' },
-  { name: 'Blogs', href: '/blogs' },
-  { name: 'Rides', href: '/rides' },
-  { name: 'Destinations', href: '/destinations' },
-  { name: 'Wiki', href: '/wiki' },
-  { name: 'Contact', href: '/contact' },
+  { name: "Home", href: "/" },
+  { name: "Knowledge & Maintenance", href: "/maintenance" },
+  { name: "Blogs", href: "/blogs" },
+  { name: "Rides", href: "/rides" },
+  { name: "Destinations", href: "/destinations" },
+  { name: "Wiki", href: "/wiki" },
+  { name: "Contact", href: "/contact" },
 ];
 
 export default function Header() {
@@ -22,7 +22,7 @@ export default function Header() {
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50">
       {/* Top bar with contact info */}
-      <div className="bb-gradient text-white py-2">
+      <div className="bg-gradient-to-r from-[#3A5AFF] to-[#E94560] text-white py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center text-sm">
             <div className="flex items-center space-x-4">
@@ -36,7 +36,9 @@ export default function Header() {
               </div>
             </div>
             <div className="hidden md:block">
-              <span className="text-yellow-300">🏍️ Ride Safe, Ride Together</span>
+              <span className="text-yellow-300">
+                🏍️ Ride Safe, Ride Together
+              </span>
             </div>
           </div>
         </div>
