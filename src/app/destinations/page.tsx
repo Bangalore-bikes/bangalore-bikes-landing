@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapPin, Clock, Star, Filter, Search, ArrowRight } from "lucide-react";
+import { MapPin, Clock, Star, Search, ArrowRight } from "lucide-react";
 
 // Mock data - in real app, this would come from CSV
 const destinations = [
@@ -193,8 +193,8 @@ export default function DestinationsPage() {
               Discover Amazing Destinations
             </h1>
             <p className="text-xl text-gray-200 mb-8">
-              Explore Karnataka's most scenic routes and hidden gems. From hill
-              stations to heritage sites.
+              Explore Karnataka&apos;s most scenic routes and hidden gems. From
+              hill stations to heritage sites.
             </p>
           </div>
         </div>
@@ -304,6 +304,9 @@ export default function DestinationsPage() {
                     <SelectItem value="hill station">Hill Station</SelectItem>
                     <SelectItem value="heritage">Heritage</SelectItem>
                     <SelectItem value="beach">Beach</SelectItem>
+                    <SelectItem value="adventure">
+                      Adventure &apos;N&apos; Fun
+                    </SelectItem>
                   </SelectContent>
                 </Select>
 

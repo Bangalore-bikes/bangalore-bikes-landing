@@ -1,13 +1,7 @@
 "use client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -297,8 +291,8 @@ export default function SOSPage() {
             <div className="bg-purple-50 p-6 rounded-lg">
               <h3 className="font-semibold text-purple-900 mb-2">Stay Calm</h3>
               <p className="text-purple-800 text-sm">
-                Keep calm, assess the situation, and don't attempt repairs
-                you're not confident about.
+                Keep calm, assess the situation, and don&apos;t attempt repairs
+                you&apos;re not confident about.
               </p>
             </div>
 

@@ -2,7 +2,6 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -144,7 +143,7 @@ export default function RidesPage() {
               Official Rides & Adventures
             </h1>
             <p className="text-xl text-gray-200 mb-8">
-              Join our organized rides to explore Karnataka's most scenic
+              Join our organized rides to explore Karnataka&apos;s most scenic
               routes. From sunrise rides to multi-day expeditions.
             </p>
             <div className="flex justify-center space-x-8 text-sm">

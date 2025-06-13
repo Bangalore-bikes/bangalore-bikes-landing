@@ -64,8 +64,8 @@ export default function FeaturesSection() {
             Everything You Need for Your Royal Enfield
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            From maintenance guides to epic rides, we've got your motorcycle
-            journey covered.
+            From maintenance guides to epic rides, we&apos;ve got your
+            motorcycle journey covered.
           </p>
         </div>
 

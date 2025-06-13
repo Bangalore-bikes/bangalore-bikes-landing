@@ -80,7 +80,7 @@ export default function ContactPage() {
   });
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -124,7 +124,7 @@ export default function ContactPage() {
             </h1>
             <p className="text-xl text-gray-200 mb-8">
               Have questions about Royal Enfield maintenance, upcoming rides, or
-              want to join our community? We're here to help.
+              want to join our community? We&apos;re here to help.
             </p>
           </div>
         </div>
@@ -190,8 +190,8 @@ export default function ContactPage() {
                   Send us a Message
                 </CardTitle>
                 <CardDescription>
-                  Fill out the form below and we'll get back to you as soon as
-                  possible.
+                  We&apos;d love to hear from you! Please fill out the form
+                  below and we&apos;ll get back to you as soon as possible.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -422,8 +422,8 @@ export default function ContactPage() {
                 </h3>
                 <p className="text-gray-600 text-sm">
                   Visit our Rides page, select an upcoming ride, and click
-                  "Register Now". Make sure to read the ride guidelines before
-                  registering.
+                  &quot;Register Now&quot;. Make sure to read the ride
+                  guidelines before registering.
                 </p>
               </div>
 
