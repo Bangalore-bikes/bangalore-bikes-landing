@@ -8,7 +8,6 @@ import Link from "next/link";
 const heroImages = [
   "https://images.pexels.com/photos/2116475/pexels-photo-2116475.jpeg",
   "https://images.pexels.com/photos/1119796/pexels-photo-1119796.jpeg",
-  "https://images.pexels.com/photos/2116469/pexels-photo-2116469.jpeg",
 ];
 
 export default function HeroSection() {
