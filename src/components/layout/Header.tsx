@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, Phone, Mail } from "lucide-react";
+import { Menu, X, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navigation = [
@@ -27,10 +27,6 @@ export default function Header() {
           <div className="flex justify-between items-center text-sm">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-1">
-                <Phone className="h-3 w-3" />
-                <span>+91 98765 43210</span>
-              </div>
-              <div className="flex items-center space-x-1">
                 <Mail className="h-3 w-3" />
                 <span>admin@bangalorebikes.com</span>
               </div>
@@ -50,7 +46,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
             <Image
-              src="/BB-logo.jpg"
+              src="/logo-max-res.jpeg"
               alt="Bangalore Bikes"
               width={60}
               height={60}
@@ -60,7 +56,6 @@ export default function Header() {
               <h1 className="font-display text-2xl font-bold text-[var(--bb-navy)]">
                 Bangalore Bikes
               </h1>
-              <p className="text-sm text-gray-600">Royal Enfield Community</p>
             </div>
           </Link>
 
