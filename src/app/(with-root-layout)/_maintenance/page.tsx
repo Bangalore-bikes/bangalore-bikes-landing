@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Wrench, MapPin, Phone, ArrowRight, CheckCircle } from "lucide-react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 const maintenanceCategories = [
   {

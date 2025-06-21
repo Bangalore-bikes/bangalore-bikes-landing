@@ -26,7 +26,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 interface MenuItem {
   title: string;
@@ -117,7 +117,7 @@ const Navbar = ({
         {/* Desktop Menu */}
         <nav className="hidden justify-between lg:flex">
           {/* Logo */}
-          <a href={logo.url} className="flex items-center gap-4">
+          <Link href={logo.url} className="flex items-center gap-4">
             <Image
               src={logo.src}
               className="max-h-8 rounded-full"
@@ -129,7 +129,7 @@ const Navbar = ({
             <span className="text-lg font-semibold tracking-tighter">
               {logo.title}
             </span>
-          </a>
+          </Link>
           <div className="flex justify-end items-center gap-6">
             <div className="flex items-center">
               <NavigationMenu>
@@ -138,7 +138,11 @@ const Navbar = ({
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
-            <Button>Join Us</Button>
+            <Button
+              onClick={() => window.open("https://reddit.com/r/bangalorebikes")}
+            >
+              Join Us
+            </Button>
           </div>
         </nav>
 
@@ -146,7 +150,7 @@ const Navbar = ({
         <div className="block lg:hidden">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <a href={logo.url} className="flex items-center gap-2">
+            <Link href={logo.url} className="flex items-center gap-2">
               <Image
                 src={logo.src}
                 className="max-h-8"
@@ -155,7 +159,7 @@ const Navbar = ({
                 width={32}
                 height={32}
               />
-            </a>
+            </Link>
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon">
@@ -165,7 +169,7 @@ const Navbar = ({
               <SheetContent className="overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle>
-                    <a href={logo.url} className="flex items-center gap-2">
+                    <Link href={logo.url} className="flex items-center gap-2">
                       <Image
                         src={logo.src}
                         className="max-h-8"
@@ -176,7 +180,7 @@ const Navbar = ({
                       <h2 className="text-lg font-semibold tracking-tighter">
                         {logo.title}
                       </h2>
-                    </a>
+                    </Link>
                   </SheetTitle>
                 </SheetHeader>
                 <div className="flex flex-col gap-6 p-4">
@@ -189,7 +193,9 @@ const Navbar = ({
                   </Accordion>
 
                   <div className="flex flex-col gap-3">
-                    <Button asChild>Join Us</Button>
+                    <Button asChild onClick={() => {}}>
+                      Join Us
+                    </Button>
                   </div>
                 </div>
               </SheetContent>
@@ -246,9 +252,9 @@ const renderMobileMenuItem = (item: MenuItem) => {
   }
 
   return (
-    <a key={item.title} href={item.url} className="text-md font-semibold">
+    <Link key={item.title} href={item.url} className="text-md font-semibold">
       {item.title}
-    </a>
+    </Link>
   );
 };
 

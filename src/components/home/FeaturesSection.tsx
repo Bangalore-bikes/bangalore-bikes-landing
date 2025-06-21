@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Wrench, MapPin, BookOpen, Users, Phone, Calendar } from "lucide-react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 const features = [
   {
