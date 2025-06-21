@@ -30,7 +30,7 @@ const Hero = () => {
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-8 w-full lg:w-3/4 self-center  px-2 lg:px-8">
+    <div className="flex flex-col gap-8 w-full self-center px-2 lg:px-8">
       <Hero />
       <UpcomingRides />
       <LatestFromBlog />

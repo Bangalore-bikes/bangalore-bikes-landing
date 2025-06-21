@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { Navbar } from "@/components/common/navbar";
+import { Footer } from "@/components/common/footer";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -32,9 +33,10 @@ export default function RootLayout({
         >
           <div className="min-h-svh flex flex-col">
             <Navbar />
-            <div className="flex grow flex-col px-2 sm:px-8 mt-16">
+            <div className="flex grow flex-col px-2 sm:px-8 mt-16 w-full lg:w-3/4 self-center">
               {children}
             </div>
+            <Footer />
           </div>
         </ThemeProvider>
       </body>
