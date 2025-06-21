@@ -2,6 +2,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
+import { Navbar } from "@/components/common/navbar";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -29,7 +30,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <div className="min-h-svh flex flex-col">
+            <Navbar />
+            <div className="flex grow flex-col px-2 sm:px-8">{children}</div>
+          </div>
         </ThemeProvider>
       </body>
     </html>

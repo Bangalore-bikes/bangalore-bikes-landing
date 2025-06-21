@@ -1,4 +1,3 @@
-import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import {
   Card,
@@ -109,8 +108,6 @@ export default function BlogsPage() {
 
   return (
     <main>
-      <Header />
-
       {/* Hero Section */}
       <section className="bb-gradient text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

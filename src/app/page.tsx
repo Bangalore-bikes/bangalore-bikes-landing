@@ -2,7 +2,7 @@ import { RedditIcon } from "@/components/icons/reddit";
 
 const ParkingPage = () => {
   return (
-    <div className="flex flex-col min-h-svh justify-center items-center gap-8">
+    <div className="flex flex-grow flex-col justify-center items-center gap-8">
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-4xl font-bold">Welcome to Bangalore Bikes</h1>
         <p className="text-lg text-muted-foreground">
@@ -28,9 +28,5 @@ const ParkingPage = () => {
 };
 
 export default function Home() {
-  return (
-    <main className="px-4 @sm:px-6">
-      <ParkingPage />
-    </main>
-  );
+  return <ParkingPage />;
 }
