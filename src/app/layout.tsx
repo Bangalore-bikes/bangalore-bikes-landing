@@ -32,7 +32,9 @@ export default function RootLayout({
         >
           <div className="min-h-svh flex flex-col">
             <Navbar />
-            <div className="flex grow flex-col px-2 sm:px-8">{children}</div>
+            <div className="flex grow flex-col px-2 sm:px-8 mt-16">
+              {children}
+            </div>
           </div>
         </ThemeProvider>
       </body>
