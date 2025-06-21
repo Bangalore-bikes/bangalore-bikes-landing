@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, Phone, Mail } from "lucide-react";
+import { Menu, X, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navigation = [
@@ -20,16 +20,12 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white shadow-lg sticky top-0 z-50">
+    <header className="shadow-lg sticky top-0 z-50">
       {/* Top bar with contact info */}
       <div className="bg-gradient-to-r from-[#3A5AFF] to-[#E94560] text-white py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center text-sm">
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-1">
-                <Phone className="h-3 w-3" />
-                <span>+91 98765 43210</span>
-              </div>
               <div className="flex items-center space-x-1">
                 <Mail className="h-3 w-3" />
                 <span>admin@bangalorebikes.com</span>
@@ -50,7 +46,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
             <Image
-              src="/BB-logo.jpg"
+              src="/logo-max-res.jpeg"
               alt="Bangalore Bikes"
               width={60}
               height={60}
@@ -60,7 +56,6 @@ export default function Header() {
               <h1 className="font-display text-2xl font-bold text-[var(--bb-navy)]">
                 Bangalore Bikes
               </h1>
-              <p className="text-sm text-gray-600">Royal Enfield Community</p>
             </div>
           </Link>
 

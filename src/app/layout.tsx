@@ -1,15 +1,18 @@
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Space_Grotesk } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
-  title: "Bangalore Bikes - Royal Enfield Community & Maintenance Hub",
+  title: "Bangalore Bikes",
   description:
-    "Your ultimate destination for Royal Enfield maintenance, rides, and community in Bangalore. Expert guides, trusted garages, and epic rides await.",
+    "Started in 2024 we aim to be a hub for all biking enthusiasts in Bangalore. Whether you're a veteran or just someone who enjoys a leisurely ride through the city, this community is for you.",
   keywords:
-    "Royal Enfield, Bangalore, motorcycle maintenance, bike rides, motorcycle community",
+    "bangalore, motorcycle maintenance, bike rides, motorcycle community",
 };
 
 export default function RootLayout({
@@ -18,9 +21,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${spaceGrotesk.className} antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
