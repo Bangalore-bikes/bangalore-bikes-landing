@@ -153,7 +153,7 @@ const Navbar = ({
             <Link href={logo.url} className="flex items-center gap-2">
               <Image
                 src={logo.src}
-                className="max-h-8"
+                className="max-h-8 rounded-full"
                 alt={logo.alt}
                 quality={50}
                 width={32}
