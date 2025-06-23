@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play, Users, MapPin, Wrench } from "lucide-react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 const heroImages = [
   "https://images.pexels.com/photos/2116475/pexels-photo-2116475.jpeg",
