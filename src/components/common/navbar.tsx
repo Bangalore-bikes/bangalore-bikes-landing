@@ -109,7 +109,7 @@ const Navbar = ({
 
   return (
     <section
-      className={`py-4 px-4 sm:px-8 top-0 fixed w-full z-50 transition-transform duration-300 ${
+      className={`py-4 px-4 sm:px-8 top-0 fixed w-full z-50 transition-transform duration-300 bg-background/80 backdrop-blur-sm border-b border-border/50 ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
@@ -227,7 +227,7 @@ const renderMenuItem = (item: MenuItem) => {
     <NavigationMenuItem key={item.title}>
       <NavigationMenuLink
         href={item.url}
-        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-accent-foreground"
+        className="group inline-flex h-10 w-max items-center justify-center px-4 py-2 text-sm font-medium transition-colors hover:text-accent-foreground"
       >
         {item.title}
       </NavigationMenuLink>
