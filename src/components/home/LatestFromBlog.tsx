@@ -59,7 +59,7 @@ export const LatestFromBlog = () => {
                   src={post.imageUrl}
                   alt={post.title}
                   fill
-                  objectFit="cover"
+                  className="object-cover"
                 />
               </div>
             </div>
