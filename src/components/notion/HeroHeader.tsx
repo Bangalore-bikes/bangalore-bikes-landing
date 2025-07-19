@@ -1,39 +1,40 @@
-import raf from 'raf'
-import random from 'random'
-import React, { Component } from 'react'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import raf from "raf";
+import random from "random";
+import React, { Component } from "react";
 
-import { ReactFluidAnimation } from './fluid-animation'
+import { ReactFluidAnimation } from "./fluid-animation";
 
-const exp = random.exponential()
-const numSplatsPerEpoch = 1
-const minSplatRadius = 0.01
-const maxSplatRadius = 0.03
+const exp = random.exponential();
+const numSplatsPerEpoch = 1;
+const minSplatRadius = 0.01;
+const maxSplatRadius = 0.03;
 
 export class HeroHeader extends Component<{
-  className?: string
+  className?: string;
 }> {
-  _time: number = Date.now()
-  _direction: number = 1
-  _tickRaf: any
-  _timeout: any
-  _animation: any
+  _time: number = Date.now();
+  _direction: number = 1;
+  _tickRaf: any;
+  _timeout: any;
+  _animation: any;
 
   override componentDidMount() {
-    this._time = Date.now()
-    this._direction = 1
-    this._reset()
-    this._tick()
+    this._time = Date.now();
+    this._direction = 1;
+    this._reset();
+    this._tick();
   }
 
   override componentWillUnmount() {
     if (this._tickRaf) {
-      raf.cancel(this._tickRaf)
-      this._tickRaf = null
+      raf.cancel(this._tickRaf);
+      this._tickRaf = null;
     }
 
     if (this._timeout) {
-      clearTimeout(this._timeout)
-      this._timeout = null
+      clearTimeout(this._timeout);
+      this._timeout = null;
     }
   }
 
@@ -43,68 +44,68 @@ export class HeroHeader extends Component<{
         className={this.props.className}
         animationRef={this._animationRef}
       />
-    )
+    );
   }
 
   _animationRef = (ref: any) => {
-    this._animation = ref
-    this._reset()
-  }
+    this._animation = ref;
+    this._reset();
+  };
 
   _reset() {
     if (this._animation) {
       this._animation.config.splatRadius = random.float(
         minSplatRadius,
         maxSplatRadius
-      )
-      this._animation.addRandomSplats(random.int(100, 180))
+      );
+      this._animation.addRandomSplats(random.int(100, 180));
     }
   }
 
   _tick = () => {
-    this._tickRaf = null
-    this._timeout = null
+    this._tickRaf = null;
+    this._timeout = null;
 
-    let scale = 1.0
+    let scale = 1.0;
 
     if (this._animation) {
-      const w = this._animation.width
-      const h = this._animation.height
+      const w = this._animation.width;
+      const h = this._animation.height;
 
       // adjust the intensity scale depending on the canvas width, so it's less
       // intense on smaller screens
-      const s = Math.max(0.1, Math.min(1, w / 1200))
-      scale = Math.pow(s, 1.2)
+      const s = Math.max(0.1, Math.min(1, w / 1200));
+      scale = Math.pow(s, 1.2);
 
       this._animation.config.splatRadius = random.float(
         minSplatRadius * scale,
         maxSplatRadius * scale
-      )
+      );
 
-      const splats = []
+      const splats = [];
       for (let i = 0; i < numSplatsPerEpoch; ++i) {
-        const color = [random.float(10), random.float(10), random.float(10)]
+        const color = [random.float(10), random.float(10), random.float(10)];
 
-        const w0 = w / 3.0
-        const w1 = (w * 2.0) / 3.0
+        const w0 = w / 3.0;
+        const w1 = (w * 2.0) / 3.0;
 
-        const h0 = h / 3.0
-        const h1 = (h * 2.0) / 3.0
+        const h0 = h / 3.0;
+        const h1 = (h * 2.0) / 3.0;
 
         while (true) {
-          const x = random.float(w)
-          const y = random.float(h)
+          const x = random.float(w);
+          const y = random.float(h);
 
           // favor uniformly distributed samples within the center-ish of the canvas
           if (x > w0 && x < w1 && y > h0 && y < h1) {
-            continue
+            continue;
           }
 
-          const dx = random.float(-1, 1) * random.float(200, 3000) * scale
-          const dy = random.float(-1, 1) * random.float(200, 3000) * scale
-          const splat = { x, y, dx, dy, color }
-          splats.push(splat)
-          break
+          const dx = random.float(-1, 1) * random.float(200, 3000) * scale;
+          const dy = random.float(-1, 1) * random.float(200, 3000) * scale;
+          const splat = { x, y, dx, dy, color };
+          splats.push(splat);
+          break;
         }
 
         // old version which generated samples along a circle
@@ -120,16 +121,16 @@ export class HeroHeader extends Component<{
         // splats.push(splat)
       }
 
-      this._animation.addSplats(splats)
+      this._animation.addSplats(splats);
     }
 
     // using an exponential distribution here allows us to favor bursts of activity
     // but also allow for more occasional pauses
-    const dampenedScale = Math.pow(scale, 0.2)
-    const timeout = (exp() * 100) / dampenedScale
+    const dampenedScale = Math.pow(scale, 0.2);
+    const timeout = (exp() * 100) / dampenedScale;
 
     this._timeout = setTimeout(() => {
-      this._tickRaf = raf(this._tick)
-    }, timeout)
-  }
+      this._tickRaf = raf(this._tick);
+    }, timeout);
+  };
 }

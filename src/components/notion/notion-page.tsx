@@ -15,12 +15,7 @@ import {
 } from "notion-utils";
 import * as React from "react";
 import BodyClassName from "react-body-classname";
-import {
-  type NotionComponents,
-  NotionRenderer,
-  useNotionContext,
-} from "react-notion-x";
-import { EmbeddedTweet, TweetNotFound, TweetSkeleton } from "react-tweet";
+import { type NotionComponents, NotionRenderer } from "react-notion-x";
 import { useSearchParam } from "react-use";
 
 import type * as types from "@/lib/notion/types";
@@ -28,16 +23,15 @@ import * as config from "@/lib/notion/config";
 import { mapImageUrl } from "@/lib/notion/map-image-url";
 import { getCanonicalPageUrl, mapPageUrl } from "@/lib/notion/map-page-url";
 import { searchNotion } from "@/lib/notion/search-notion";
-import { useDarkMode } from "@/lib/notion/use-dark-mode";
 
 import { Footer } from "./Footer";
 import { GitHubShareButton } from "./GitHubShareButton";
 import { Loading } from "./Loading";
 import { NotionPageHeader } from "./NotionPageHeader";
-import { Page404 } from "./Page404";
 import { PageAside } from "./PageAside";
 import { PageHead } from "./PageHead";
 import styles from "./styles.module.css";
+import { notFound } from "next/navigation";
 
 // -----------------------------------------------------------------------------
 // dynamic imports for optional components
@@ -130,17 +124,6 @@ const Modal = dynamic(
   }
 );
 
-function Tweet({ id }: { id: string }) {
-  const { recordMap } = useNotionContext();
-  const tweet = (recordMap as types.ExtendedTweetRecordMap)?.tweets?.[id];
-
-  return (
-    <React.Suspense fallback={<TweetSkeleton />}>
-      {tweet ? <EmbeddedTweet tweet={tweet} /> : <TweetNotFound />}
-    </React.Suspense>
-  );
-}
-
 const propertyLastEditedTimeValue = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   { block, pageHeader }: any,
@@ -225,7 +208,6 @@ export function NotionPage({
       Code,
       Collection,
       Modal,
-      Tweet,
       Header: NotionPageHeader,
       propertyLastEditedTimeValue,
       propertyTextValue,
@@ -237,8 +219,6 @@ export function NotionPage({
 
   // lite mode is for oembed
   const isLiteMode = lite === "true";
-
-  const { isDarkMode } = useDarkMode();
 
   const siteMapPageUrl = React.useMemo(() => {
     const params: Record<string, string> = {};
@@ -289,7 +269,7 @@ export function NotionPage({
   }
 
   if (error || !site || !block) {
-    return <Page404 site={site} pageId={pageId} error={error} />;
+    return notFound();
   }
 
   const name = getBlockTitle(block, recordMap) || site.name;
@@ -339,7 +319,7 @@ export function NotionPage({
       />
 
       {isLiteMode && <BodyClassName className="notion-lite" />}
-      {isDarkMode && <BodyClassName className="dark-mode" />}
+      <BodyClassName className="dark-mode" />
 
       <NotionRenderer
         bodyClassName={cs(
@@ -347,7 +327,7 @@ export function NotionPage({
           pageId === site.rootNotionPageId && "index-page",
           tagsPage && "tags-page"
         )}
-        darkMode={isDarkMode}
+        darkMode={true}
         components={components}
         recordMap={recordMap}
         rootPageId={site.rootNotionPageId}
