@@ -1,7 +1,4 @@
 import type * as types from "notion-types";
-// import { IoMoonSharp } from '@react-icons/all-files/io5/IoMoonSharp'
-// import { IoSunnyOutline } from "@react-icons/all-files/io5/IoSunnyOutline";
-import { Moon, Sun } from "lucide-react";
 import cs from "classnames";
 import * as React from "react";
 import { Breadcrumbs, Header, Search, useNotionContext } from "react-notion-x";
@@ -11,31 +8,8 @@ import {
   navigationLinks,
   navigationStyle,
 } from "@/lib/notion/config";
-import { useDarkMode } from "@/lib/notion/use-dark-mode";
 
 import styles from "./styles.module.css";
-
-function ToggleThemeButton() {
-  const [hasMounted, setHasMounted] = React.useState(false);
-  const { isDarkMode, toggleDarkMode } = useDarkMode();
-
-  React.useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  const onToggleTheme = React.useCallback(() => {
-    toggleDarkMode();
-  }, [toggleDarkMode]);
-
-  return (
-    <div
-      className={cs("breadcrumb", "button", !hasMounted && styles.hidden)}
-      onClick={onToggleTheme}
-    >
-      {hasMounted && isDarkMode ? <Moon /> : <Sun />}
-    </div>
-  );
-}
 
 export function NotionPageHeader({
   block,
@@ -83,8 +57,6 @@ export function NotionPageHeader({
               }
             })
             .filter(Boolean)}
-
-          <ToggleThemeButton />
 
           {isSearchEnabled && <Search block={block} title={null} />}
         </div>

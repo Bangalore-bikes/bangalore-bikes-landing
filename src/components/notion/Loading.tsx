@@ -1,10 +1,5 @@
-import { LoadingIcon } from './LoadingIcon'
-import styles from './styles.module.css'
+import { Loader2 } from "lucide-react";
 
 export function Loading() {
-  return (
-    <div className={styles.container}>
-      <LoadingIcon />
-    </div>
-  )
+  return <Loader2 className="animate-spin" />;
 }

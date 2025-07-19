@@ -1,16 +1,20 @@
-import { api, host } from './config'
+import { api, host } from "./config";
 
 export function getSocialImageUrl(pageId: string | undefined) {
   try {
-    const url = new URL(api.getSocialImage, host)
+    const url = new URL(api.getSocialImage, host);
 
     if (pageId) {
-      url.searchParams.set('id', pageId)
-      return url.toString()
+      url.searchParams.set("id", pageId);
+      return url.toString();
     }
-  } catch (err: any) {
-    console.warn('error invalid social image url', pageId, err.message)
+  } catch (err: unknown) {
+    console.warn(
+      "error invalid social image url",
+      pageId,
+      err instanceof Error ? err.message : "unknown error"
+    );
   }
 
-  return null
+  return null;
 }
