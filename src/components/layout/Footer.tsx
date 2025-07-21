@@ -1,21 +1,12 @@
 import Link from "next/link";
-import Image from "next/image";
-import {
-  Facebook,
-  Instagram,
-  Twitter,
-  Youtube,
-  Mail,
-  Phone,
-  MapPin,
-} from "lucide-react";
+
 
 export default function Footer() {
   return (
     <footer className="bb-gradient text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Brand Section */}
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-3 mb-4">
               <Image
@@ -64,7 +55,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
+
           <div>
             <h4 className="font-semibold text-[var(--bb-gold)] mb-4">
               Quick Links
@@ -113,7 +104,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Resources */}
+
           <div>
             <h4 className="font-semibold text-[var(--bb-gold)] mb-4">
               Resources
@@ -161,8 +152,6 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-
-          {/* Contact Info */}
           <div>
             <h4 className="font-semibold text-[var(--bb-gold)] mb-4">
               Get in Touch
@@ -186,27 +175,35 @@ export default function Footer() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-600 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-300 text-sm">
-            © 2024 Bangalore Bikes. All rights reserved.
-          </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
+          <Link
+              href="/privacy"
+              className="text-gray-300 hover:text-white text-sm transition-colors"
+            >
+              About
+            </Link>
+            <Link
+              href="/privacy"
+              className="text-gray-300 hover:text-white text-sm transition-colors"
+            >
+              Contact
+            </Link>
             <Link
               href="/privacy"
               className="text-gray-300 hover:text-white text-sm transition-colors"
             >
               Privacy Policy
             </Link>
+
             <Link
               href="/terms"
               className="text-gray-300 hover:text-white text-sm transition-colors"
             >
               Terms of Service
             </Link>
-          </div>
         </div>
       </div>
     </footer>

@@ -1,4 +1,3 @@
-import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import {
   Card,
@@ -17,6 +16,7 @@ import {
   Fuel,
   ArrowRight,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const upcomingRides = [
   {
@@ -133,55 +133,23 @@ const getStatusColor = (status: string) => {
 export default function RidesPage() {
   return (
     <main>
-      <Header />
+      {/* <Header /> */}
 
       {/* Hero Section */}
-      <section className="bb-gradient text-white py-20">
+      <section className="bb-gradient text-white py-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-4xl mx-auto">
+          <div className="max-w-4xl">
             <h1 className="font-display text-4xl md:text-5xl font-bold mb-6">
-              Official Rides & Adventures
+              Official Rides 
             </h1>
-            <p className="text-xl text-gray-200 mb-8">
-              Join our organized rides to explore Karnataka&apos;s most scenic
-              routes. From sunrise rides to multi-day expeditions.
-            </p>
-            <div className="flex justify-center space-x-8 text-sm">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[var(--bb-gold)]">
-                  50+
-                </div>
-                <div>Rides Organized</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[var(--bb-gold)]">
-                  500+
-                </div>
-                <div>Happy Riders</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[var(--bb-gold)]">
-                  25+
-                </div>
-                <div>Destinations</div>
-              </div>
-            </div>
           </div>
+            <Input placeholder="Search Rides" />
         </div>
       </section>
 
       {/* Upcoming Rides */}
-      <section className="py-16 bg-white">
+      <section className="py-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl font-bold text-[var(--bb-navy)] mb-4">
-              Upcoming Rides
-            </h2>
-            <p className="text-xl text-gray-600">
-              Register now for these amazing adventures
-            </p>
-          </div>
-
           <div className="space-y-8">
             {upcomingRides.map((ride, index) => (
               <Card
