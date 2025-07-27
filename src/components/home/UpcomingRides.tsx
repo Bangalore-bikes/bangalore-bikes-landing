@@ -40,7 +40,7 @@ export const UpcomingRides = () => {
                   src={ride.imageUrl}
                   alt={ride.title}
                   fill
-                  objectFit="cover"
+                  className="object-cover"
                 />
               </div>
               <CardHeader className="px-1">
