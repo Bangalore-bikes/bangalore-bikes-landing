@@ -1,3 +1,5 @@
+"use client";
+
 import Footer from "@/components/layout/Footer";
 import {
   Card,
@@ -6,129 +8,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
-  Calendar,
-  MapPin,
+  // Calendar,
+  // MapPin,
   Users,
   Clock,
   Camera,
   Fuel,
-  ArrowRight,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-
-const upcomingRides = [
-  {
-    title: "Nandi Hills Sunrise Ride",
-    date: "2024-01-15",
-    time: "5:00 AM",
-    meetingPoint: "Hebbal Flyover",
-    destination: "Nandi Hills",
-    distance: "65 km",
-    duration: "4 hours",
-    difficulty: "Easy",
-    participants: 25,
-    maxParticipants: 30,
-    description:
-      "Experience the breathtaking sunrise from Nandi Hills. Perfect for beginners and photography enthusiasts.",
-    highlights: [
-      "Sunrise Photography",
-      "Breakfast at Hills",
-      "Group Photos",
-      "Easy Terrain",
-    ],
-    image: "https://images.pexels.com/photos/1119796/pexels-photo-1119796.jpeg",
-    status: "open",
-  },
-  {
-    title: "Coorg Coffee Trail Weekend",
-    date: "2024-01-22",
-    time: "6:00 AM",
-    meetingPoint: "Electronic City Toll Plaza",
-    destination: "Coorg (Madikeri)",
-    distance: "280 km",
-    duration: "2 days",
-    difficulty: "Moderate",
-    participants: 18,
-    maxParticipants: 20,
-    description:
-      "Two-day adventure through coffee plantations and misty hills of Coorg. Includes overnight stay.",
-    highlights: [
-      "Coffee Plantation Tour",
-      "Waterfall Visit",
-      "Local Cuisine",
-      "Overnight Stay",
-    ],
-    image: "https://images.pexels.com/photos/2116475/pexels-photo-2116475.jpeg",
-    status: "filling-fast",
-  },
-  {
-    title: "Hampi Heritage Expedition",
-    date: "2024-02-05",
-    time: "5:30 AM",
-    meetingPoint: "Tumkur Road Toll Plaza",
-    destination: "Hampi",
-    distance: "350 km",
-    duration: "3 days",
-    difficulty: "Challenging",
-    participants: 12,
-    maxParticipants: 15,
-    description:
-      "Explore the ancient ruins of Hampi on this multi-day adventure. For experienced riders only.",
-    highlights: [
-      "UNESCO World Heritage Site",
-      "Ancient Temples",
-      "Coracle Ride",
-      "Camping Experience",
-    ],
-    image: "https://images.pexels.com/photos/2116469/pexels-photo-2116469.jpeg",
-    status: "open",
-  },
-];
-
-const pastRides = [
-  {
-    title: "Chikmagalur Coffee Circuit",
-    date: "2024-01-08",
-    participants: 22,
-    images: 12,
-    image: "https://images.pexels.com/photos/1119796/pexels-photo-1119796.jpeg",
-  },
-  {
-    title: "Mysore Palace Night Ride",
-    date: "2024-01-01",
-    participants: 35,
-    images: 28,
-    image: "https://images.pexels.com/photos/2116475/pexels-photo-2116475.jpeg",
-  },
-];
-
-const getDifficultyColor = (difficulty: string) => {
-  switch (difficulty.toLowerCase()) {
-    case "easy":
-      return "bg-green-100 text-green-800";
-    case "moderate":
-      return "bg-yellow-100 text-yellow-800";
-    case "challenging":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "open":
-      return "bg-green-100 text-green-800";
-    case "filling-fast":
-      return "bg-orange-100 text-orange-800";
-    case "full":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
+import RideCard from "@/components/rides/RideCard";
+import { upcomingRides, pastRides } from "@/data/rides";
+import { motion } from "framer-motion";
 
 export default function RidesPage() {
   return (
@@ -140,133 +31,31 @@ export default function RidesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
             <h1 className="font-display text-4xl md:text-5xl font-bold mb-6">
-              Official Rides 
+              Official Rides
             </h1>
           </div>
-            <Input placeholder="Search Rides" />
+          <Input placeholder="Search Rides" />
         </div>
       </section>
 
       {/* Upcoming Rides */}
       <section className="py-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-8">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            className="space-y-8"
+          >
             {upcomingRides.map((ride, index) => (
-              <Card
-                key={index}
-                className="overflow-hidden hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="md:flex">
-                  <div className="md:w-1/3">
-                    <div
-                      className="h-64 md:h-full bg-cover bg-center"
-                      style={{ backgroundImage: `url(${ride.image})` }}
-                    />
-                  </div>
-
-                  <div className="md:w-2/3 p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="font-display text-2xl font-bold text-[var(--bb-navy)] mb-2">
-                          {ride.title}
-                        </h3>
-                        <p className="text-gray-600 mb-4">{ride.description}</p>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Badge className={getDifficultyColor(ride.difficulty)}>
-                          {ride.difficulty}
-                        </Badge>
-                        <Badge className={getStatusColor(ride.status)}>
-                          {ride.status === "filling-fast"
-                            ? "Filling Fast"
-                            : ride.status}
-                        </Badge>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-sm">
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="h-4 w-4 text-gray-500" />
-                        <div>
-                          <div className="font-semibold">
-                            {new Date(ride.date).toLocaleDateString()}
-                          </div>
-                          <div className="text-gray-500">{ride.time}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="h-4 w-4 text-gray-500" />
-                        <div>
-                          <div className="font-semibold">{ride.distance}</div>
-                          <div className="text-gray-500">Distance</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-2">
-                        <Clock className="h-4 w-4 text-gray-500" />
-                        <div>
-                          <div className="font-semibold">{ride.duration}</div>
-                          <div className="text-gray-500">Duration</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-2">
-                        <Users className="h-4 w-4 text-gray-500" />
-                        <div>
-                          <div className="font-semibold">
-                            {ride.participants}/{ride.maxParticipants}
-                          </div>
-                          <div className="text-gray-500">Riders</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mb-6">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <MapPin className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm font-medium">
-                          Meeting Point:
-                        </span>
-                        <span className="text-sm text-gray-600">
-                          {ride.meetingPoint}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Camera className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm font-medium">Highlights:</span>
-                        <div className="flex flex-wrap gap-1">
-                          {ride.highlights.map((highlight, highlightIndex) => (
-                            <Badge
-                              key={highlightIndex}
-                              variant="secondary"
-                              className="text-xs"
-                            >
-                              {highlight}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex space-x-4">
-                      <Button className="bb-gold-gradient text-white flex-1">
-                        Register Now
-                      </Button>
-                      <Button variant="outline" className="flex-1">
-                        View Details <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+              <RideCard key={ride.id} ride={ride} index={index} />
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Past Rides Gallery */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl font-bold text-[var(--bb-navy)] mb-4">
@@ -314,7 +103,7 @@ export default function RidesPage() {
       </section>
 
       {/* Ride Guidelines */}
-      <section className="py-16 bg-white">
+      <section className="py-16 ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl font-bold text-[var(--bb-navy)] mb-4">
