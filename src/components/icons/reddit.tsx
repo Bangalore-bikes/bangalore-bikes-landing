@@ -1,15 +1,6 @@
-import { SVGProps } from "react";
-
-export function RedditIcon(props: SVGProps<SVGSVGElement>) {
+export function RedditIcon({ className }: { className?: string }) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
-      viewBox="0 0 256 256"
-      {...props}
-    >
-      {/* Icon from SVG Logos by Gil Barbara - https://raw.githubusercontent.com/gilbarbara/logos/master/LICENSE.txt */}
+    <svg viewBox="0 0 256 256" className={className} aria-hidden="true">
       <circle cx="128" cy="128" r="128" fill="#FF4500" />
       <path
         fill="#FFF"

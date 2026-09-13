@@ -1,48 +1,84 @@
-import { ThemeProvider } from "@/components/providers/theme-provider";
-import "./globals.css";
-import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
-import { Navbar } from "@/components/common/navbar";
-import { Footer } from "@/components/common/footer";
-import { ViewTransitions } from "next-view-transitions";
+import type { Metadata, Viewport } from "next";
+import { Figtree, Unbounded } from "next/font/google";
 
-const spaceGrotesk = Space_Grotesk({
+import { RevealObserver } from "@/components/common/reveal-observer";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
+import { SosFab } from "@/components/layout/sos-fab";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { SITE } from "@/data/site";
+
+import "./globals.css";
+
+const figtree = Figtree({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-figtree",
+  display: "swap",
+});
+
+const unbounded = Unbounded({
+  subsets: ["latin"],
+  weight: ["500", "700", "900"],
+  variable: "--font-unbounded",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Bangalore Bikes",
-  description:
-    "Started in 2024 we aim to be a hub for all biking enthusiasts in Bangalore. Whether you're a veteran or just someone who enjoys a leisurely ride through the city, this community is for you.",
-  keywords:
-    "bangalore, motorcycle maintenance, bike rides, motorcycle community",
+  metadataBase: new URL(SITE.url),
+  title: {
+    default: `${SITE.name} - ${SITE.subreddit}`,
+    template: `%s · ${SITE.name}`,
+  },
+  description: SITE.tagline,
+  keywords: [
+    "bangalore",
+    "bengaluru",
+    "motorcycle community",
+    "bike rides",
+    "group rides",
+    "riding routes",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: SITE.name,
+    title: `${SITE.name} - ${SITE.subreddit}`,
+    description:
+      "Weekend routes, night rides, ride rules and a community that shows up when you're stranded.",
+  },
+  twitter: { card: "summary_large_image" },
+  icons: { icon: "/logo.jpeg", apple: "/logo.jpeg" },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0b0b0d" },
+    { media: "(prefers-color-scheme: light)", color: "#f6f4ef" },
+  ],
 };
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ViewTransitions>
-      <html lang="en" suppressHydrationWarning>
-        <body className={`${spaceGrotesk.className} antialiased`}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <div className="min-h-svh flex flex-col">
-              <Navbar />
-              <div className="flex grow flex-col px-2 sm:px-8 mt-16 w-full lg:w-3/4 self-center">
-                {children}
-              </div>
-              <Footer />
-            </div>
-          </ThemeProvider>
-        </body>
-      </html>
-    </ViewTransitions>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${figtree.variable} ${unbounded.variable} antialiased`}>
+        <ThemeProvider
+          attribute="data-theme"
+          defaultTheme="dark"
+          enableSystem
+          storageKey="bb-theme"
+          disableTransitionOnChange
+        >
+          <div className="flex min-h-svh flex-col">
+            <SiteHeader />
+            <main className="grow">{children}</main>
+            <SiteFooter />
+          </div>
+          <SosFab />
+          <RevealObserver />
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

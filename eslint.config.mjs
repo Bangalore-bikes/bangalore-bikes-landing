@@ -14,6 +14,16 @@ const eslintConfig = [
     ignores: [".next/", "node_modules/", "dist/", "build/"],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+      "@typescript-eslint/no-unused-expressions": "error",
+      "@typescript-eslint/ban-ts-comment": "warn",
+    },
+  },
 ];
 
 export default eslintConfig;
