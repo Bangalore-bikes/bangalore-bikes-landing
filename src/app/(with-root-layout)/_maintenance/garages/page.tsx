@@ -1,5 +1,3 @@
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -109,7 +107,6 @@ const garages = [
 export default function GaragesPage() {
   return (
     <main>
-      <Header />
 
       {/* Hero Section */}
       <section className="bb-gradient text-white py-16">
@@ -244,7 +241,6 @@ export default function GaragesPage() {
         </div>
       </section>
 
-      <Footer />
     </main>
   );
 }

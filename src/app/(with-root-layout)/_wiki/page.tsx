@@ -1,5 +1,3 @@
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import {
   Card,
   CardContent,
@@ -147,7 +145,6 @@ const recentUpdates = [
 export default function WikiPage() {
   return (
     <main>
-      <Header />
 
       {/* Hero Section */}
       <section className="bb-gradient text-white py-20">
@@ -385,7 +382,6 @@ export default function WikiPage() {
         </div>
       </section>
 
-      <Footer />
     </main>
   );
 }

@@ -1,5 +1,3 @@
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import {
   Card,
   CardContent,
@@ -51,7 +49,6 @@ const maintenanceCategories = [
 export default function MaintenancePage() {
   return (
     <main>
-      <Header />
 
       {/* Hero Section */}
       <section className="bb-gradient text-white py-20">
@@ -207,7 +204,6 @@ export default function MaintenancePage() {
         </div>
       </section>
 
-      <Footer />
     </main>
   );
 }

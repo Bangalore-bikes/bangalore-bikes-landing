@@ -1,6 +1,4 @@
 "use client";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -101,7 +99,6 @@ const commonIssues = [
 export default function SOSPage() {
   return (
     <main>
-      <Header />
 
       {/* Hero Section */}
       <section className="bb-gradient text-white py-16">
@@ -329,7 +326,6 @@ export default function SOSPage() {
         </div>
       </section>
 
-      <Footer />
     </main>
   );
 }

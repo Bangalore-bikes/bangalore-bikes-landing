@@ -1,4 +1,3 @@
-import Footer from "@/components/layout/Footer";
 import {
   Card,
   CardDescription,
@@ -368,7 +367,6 @@ export default function RidesPage() {
         </div>
       </section>
 
-      <Footer />
     </main>
   );
 }
