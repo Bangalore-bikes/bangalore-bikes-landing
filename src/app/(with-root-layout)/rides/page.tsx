@@ -9,3 +9,6 @@ export default function RidesPage() {
     />
   );
 }
+import { createPageMetadata } from "@/lib/siteMetadata";
+
+export const metadata = createPageMetadata("/rides");

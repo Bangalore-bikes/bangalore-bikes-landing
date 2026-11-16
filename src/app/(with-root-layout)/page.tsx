@@ -37,3 +37,6 @@ export default function Home() {
     </div>
   );
 }
+import { createPageMetadata } from "@/lib/siteMetadata";
+
+export const metadata = createPageMetadata("/");

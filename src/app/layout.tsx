@@ -5,15 +5,17 @@ import { Space_Grotesk } from "next/font/google";
 import { Navbar } from "@/components/common/navbar";
 import { Footer } from "@/components/common/footer";
 import { ViewTransitions } from "next-view-transitions";
+import { siteName, siteOrigin } from "@/lib/siteMetadata";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Bangalore Bikes",
+  metadataBase: new URL(siteOrigin),
+  title: { default: siteName, template: "%s | " + siteName },
   description:
-    "Started in 2024 we aim to be a hub for all biking enthusiasts in Bangalore. Whether you're a veteran or just someone who enjoys a leisurely ride through the city, this community is for you.",
+    "A community home for r/BangaloreBikes and motorcycle riders of every brand in Bengaluru.",
   keywords:
     "bangalore, motorcycle maintenance, bike rides, motorcycle community",
 };
