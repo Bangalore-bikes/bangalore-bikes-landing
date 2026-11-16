@@ -5,15 +5,17 @@ import { Space_Grotesk } from "next/font/google";
 import { Navbar } from "@/components/common/navbar";
 import { Footer } from "@/components/common/footer";
 import { ViewTransitions } from "next-view-transitions";
+import { siteName, siteOrigin } from "@/lib/siteMetadata";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Bangalore Bikes",
+  metadataBase: new URL(siteOrigin),
+  title: { default: siteName, template: "%s | " + siteName },
   description:
-    "Started in 2024 we aim to be a hub for all biking enthusiasts in Bangalore. Whether you're a veteran or just someone who enjoys a leisurely ride through the city, this community is for you.",
+    "A community home for r/BangaloreBikes and motorcycle riders of every brand in Bengaluru.",
   keywords:
     "bangalore, motorcycle maintenance, bike rides, motorcycle community",
 };
@@ -34,8 +36,18 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <div className="min-h-svh flex flex-col">
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-background focus:px-4 focus:py-3 focus:text-foreground focus:underline"
+              >
+                Skip to content
+              </a>
               <Navbar />
-              <div className="flex grow flex-col px-2 sm:px-8 mt-16 w-full lg:w-3/4 self-center">
+              <div
+                id="main-content"
+                tabIndex={-1}
+                className="flex grow flex-col px-2 sm:px-8 mt-16 w-full lg:w-3/4 self-center scroll-mt-20"
+              >
                 {children}
               </div>
               <Footer />

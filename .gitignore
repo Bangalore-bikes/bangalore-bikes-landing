@@ -19,6 +19,10 @@
 
 # production
 /build
+/storybook-static/
+/.npm-cache/
+/.npm-tmp/
+/.bun-cache/
 
 # misc
 .DS_Store

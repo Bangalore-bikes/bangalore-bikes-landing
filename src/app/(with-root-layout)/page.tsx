@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { LatestFromBlog } from "@/components/home/LatestFromBlog";
 import { UpcomingRides } from "@/components/home/UpcomingRides";
+import { LatestArticles } from "@/components/home/LatestArticles";
 
 const Hero = () => {
   return (
@@ -8,9 +9,11 @@ const Hero = () => {
       <div className="w-full relative h-96 lg:h-[500px]">
         <Image
           src="/hero-banner.png"
-          alt="Hero"
+          alt=""
           fill
-          className="object-cover w-auto h-full overflow-hidden rounded-lg"
+          priority
+          sizes="(min-width: 1024px) 75vw, 100vw"
+          className="object-cover overflow-hidden rounded-lg"
         />
         <div className="absolute inset-0 bg-black/60 rounded-lg"></div>
 
@@ -30,10 +33,14 @@ const Hero = () => {
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-8 w-full self-center px-2 lg:px-8">
+    <main className="flex flex-col gap-8 w-full self-center px-2 lg:px-8">
       <Hero />
       <UpcomingRides />
+      <LatestArticles />
       <LatestFromBlog />
-    </div>
+    </main>
   );
 }
+import { createPageMetadata } from "@/lib/siteMetadata";
+
+export const metadata = createPageMetadata("/");
