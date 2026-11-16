@@ -1,4 +1,3 @@
-import Footer from "@/components/layout/Footer";
 import {
   Card,
   CardContent,
@@ -306,7 +305,6 @@ export default function BlogsPage() {
         </div>
       </section>
 
-      <Footer />
     </main>
   );
 }
