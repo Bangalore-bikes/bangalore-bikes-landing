@@ -2,6 +2,8 @@
 
 The initial link collection lives in [community-resources.ts](../src/data/community-resources.ts). The homepage and resource page render the same collection.
 
+The resource page supports case-insensitive, all-word search across titles, summaries, and categories, combined with a category filter. The homepage remains a short, unfiltered list. Search is local to the published collection; it does not query Reddit.
+
 ## Initial sources
 
 Source pages inspected on 2026-11-16 through web retrieval. Retrieved pages may be cached; this is not a guarantee of live availability or moderator approval.
@@ -20,5 +22,7 @@ These are links with original editorial summaries, not copies of posts or commen
 4. Obtain explicit moderator approval before describing an item as moderator-approved or a ride as official.
 5. Remove or update a link if the original is removed, becomes unavailable, or the moderators request a correction.
 6. Run lint and the production build before submitting the content change.
+
+Run `npm run test:resources` to verify query and category behavior (Node 22.18+). These tests use Node's TypeScript stripping and built-in test runner; no test dependency is required. Node may emit a module-type detection warning because the application package does not declare an ESM module type.
 
 There are no confirmed upcoming rides in the website's content collection. Historical invitations are not upcoming events. Add real event details only after the organizer confirms them for publication.

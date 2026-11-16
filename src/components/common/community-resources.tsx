@@ -1,9 +1,13 @@
 import { communityResources } from "@/data/community-resources";
 
-export function CommunityResources() {
+export function CommunityResources({
+  resources = communityResources,
+}: {
+  resources?: readonly (typeof communityResources)[number][];
+}) {
   return (
     <ul className="divide-y divide-border">
-      {communityResources.map((resource) => (
+      {resources.map((resource) => (
         <li key={resource.id} className="py-6 first:pt-0">
           <h3 className="text-xl font-semibold">
             <a

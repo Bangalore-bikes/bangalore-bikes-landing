@@ -10,7 +10,8 @@
     "lint:fix": "next lint --fix",
     "format": "prettier --write .",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test:resources": "node --experimental-strip-types --test tests/resource-search.test.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",

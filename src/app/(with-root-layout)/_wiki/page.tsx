@@ -1,6 +1,6 @@
 import { CommunityPage } from "@/components/common/community-page";
 import { communityLinks } from "@/lib/community";
-import { CommunityResources } from "@/components/common/community-resources";
+import { ResourceDirectory } from "@/components/common/resource-directory";
 
 export default function WikiPage() {
   return (
@@ -14,7 +14,7 @@ export default function WikiPage() {
         <h2 id="reddit-resources-title" className="mb-6 text-2xl font-semibold">
           Read the original discussions
         </h2>
-        <CommunityResources />
+        <ResourceDirectory />
       </section>
     </CommunityPage>
   );
