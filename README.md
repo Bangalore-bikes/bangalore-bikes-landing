@@ -41,6 +41,8 @@ npm run test:seo
 
 SEO checks inspect the production build output, so run them after building.
 
+Pull requests and pushes to `main` run these checks, both builds, and real Chrome smoke checks automatically. See [automated checks](./docs/automated-checks.md) for the workflow and troubleshooting context.
+
 Run npm test for the combined content, resource-search, and ride unit tests. The [local Storybook guide](./docs/storybook.md) explains component previews and the compatibility launcher.
 
 For local browser smoke checks, build the app, run npm start -- -p 3102 in another terminal, then run npm run test:browser. See the Storybook guide for browser prerequisites and test coverage.
@@ -48,3 +50,5 @@ For local browser smoke checks, build the app, run npm start -- -p 3102 in anoth
 ## Hosting
 
 Project is currently hosted at [bangalorebikes.com](https://bangalorebikes.com/) as a [Netlify](https://www.netlify.com/) project.
+
+[bangalorebikes.vercel.app](https://bangalorebikes.vercel.app/) is also available as the secondary/staging deployment. The primary domain remains the canonical address for search engines and sharing.

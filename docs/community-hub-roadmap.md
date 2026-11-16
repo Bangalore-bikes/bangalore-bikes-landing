@@ -121,7 +121,7 @@ These inputs do not block navigation, empty-state, fake-content, or contact-flow
 - Added per-page metadata, production sitemap and crawler rules, preview indexing exclusions, and a helpful 404.
 - Added validated shared ride data, state-aware listings, detail routes, organizer directions, and UTC ICS snapshots with IST displays. See [rides.md](./rides.md) for publication requirements.
 - The published ride collection remains empty. No real event or RSVP flow is claimed.
-- Review, release, commits, and pushing are left to the user for the latest feature work.
+- The community foundation was merged in PR #20. The owner has authorized pushing and merging subsequent verified work without requesting reviews.
 - Content is edited through validated JSON collections, with resource draft/published states, visible source-check dates, duplicate detection, and a local validation command. Draft filtering occurs before data is passed to interactive components.
 - Resources have prefilled correction links to Reddit modmail; they never send messages automatically.
 - Storybook now builds with the compatibility launcher and pinned webpack. It includes resource states, typography/palette examples, and a light/dark toolbar.
@@ -129,3 +129,9 @@ These inputs do not block navigation, empty-state, fake-content, or contact-flow
 - Added repository-backed articles with draft exclusion, author/permission metadata, structured text rendering, archive/detail pages, homepage placement, and automatic sitemap/indexing behavior. The article collection remains empty until content is supplied.
 - Added isolated Storybook ride-state and article previews. The extended Chrome suite verifies calendar visibility for all four ride states and literal-text rendering; those populated-state smoke checks now pass.
 - Added a keyboard skip-to-content link, a homepage main landmark, and responsive/priority hints for the above-fold banner. Full accessibility auditing and visual regression remain separate work.
+
+## Automated upkeep
+
+- Added a read-only GitHub Actions workflow for locked dependency installation, content validation, unit tests, lint, typechecking, production build, generated SEO checks, Storybook build and actual Chrome interactions.
+- Both hosting targets remain intact: bangalorebikes.com is primary and bangalorebikes.vercel.app is secondary/staging. The workflow does not modify DNS or hosting configuration.
+- Real content, any non-Git publishing integration, full accessibility auditing and visual regression remain outstanding; build automation does not claim to deliver those features.
