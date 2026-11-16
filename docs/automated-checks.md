@@ -23,3 +23,11 @@ The workflow has read-only repository permissions and needs no deployment secret
 `https://bangalorebikes.com` remains the canonical production origin. `https://bangalorebikes.vercel.app` remains available as a secondary/staging deployment. The quality workflow does not change either provider's domain, DNS, deployment branch or environment settings.
 
 Netlify and Vercel deployments have their own provider checks. A successful quality run verifies the repository, not public DNS availability or the providers' custom-domain configuration.
+
+## Dependency maintenance
+
+Next.js and its ESLint configuration are updated together. The security-maintenance baseline is Next.js 15.5.28 and Zod 4.6.6, the fixed versions identified by the repository's GitHub advisories on 2026-11-16. Keep exact application pins and update the committed Bun lockfile alongside the manifest.
+
+The Zod upgrade crosses a major version, so validate all three content collections and run the complete schema test suite. Next.js updates must also pass both builds, generated metadata tests and actual browser checks. A dependency alert's severity is not proof that every affected feature is reachable in this website; patching avoids relying on that assumption.
+
+Recheck GitHub dependency alerts after merging: advisory data can change, and a passing build alone is not a vulnerability scan. Do not dismiss unresolved alerts just to make the count smaller.
