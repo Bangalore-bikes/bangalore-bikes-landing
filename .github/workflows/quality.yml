@@ -1,0 +1,75 @@
+name: Community hub checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Content, build and browser checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22.19.0"
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.9"
+      - name: Install locked dependencies
+        run: bun install --frozen-lockfile
+      - name: Validate published content
+        run: npm run validate:content
+      - name: Test content, resource search and calendars
+        run: npm test
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Build production application
+        run: npm run build
+      - name: Check generated search metadata
+        run: npm run test:seo
+      - name: Build component gallery
+        run: npm run build-storybook -- --quiet
+      - name: Check browser interactions and component states
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        shell: bash
+        run: |
+          node node_modules/next/dist/bin/next start -p 3102 > "$RUNNER_TEMP/community-hub-next.log" 2>&1 &
+          app_pid=$!
+          trap 'kill "$app_pid" 2>/dev/null || true' EXIT
+          ready=false
+          for attempt in {1..30}; do
+            if curl --silent --fail http://localhost:3102/ > /dev/null; then
+              ready=true
+              break
+            fi
+            if ! kill -0 "$app_pid" 2>/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" != true ]; then
+            cat "$RUNNER_TEMP/community-hub-next.log"
+            exit 1
+          fi
+          npm run test:browser -- --storybook
