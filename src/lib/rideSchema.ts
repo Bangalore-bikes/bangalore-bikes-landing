@@ -17,16 +17,20 @@ function parseUrl(value: string) {
 }
 const httpsUrl = z
   .string()
-  .url()
+  .refine(
+    (value) =>
+      [...value].every(
+        (char) => char.charCodeAt(0) > 32 && char.charCodeAt(0) !== 127,
+      ),
+    "URLs must not contain whitespace or control characters",
+  )
+  .pipe(z.string().url())
   .refine((value) => {
     const url = parseUrl(value);
     return (
       url?.protocol === "https:" &&
       !url.username &&
-      !url.password &&
-      [...value].every(
-        (char) => char.charCodeAt(0) > 32 && char.charCodeAt(0) !== 127,
-      )
+      !url.password
     );
   }, "Use an HTTPS URL without credentials");
 

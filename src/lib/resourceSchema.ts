@@ -2,7 +2,14 @@ import { z } from "zod";
 
 const sourceUrl = z
   .string()
-  .url()
+  .refine(
+    (value) =>
+      [...value].every(
+        (char) => char.charCodeAt(0) > 32 && char.charCodeAt(0) !== 127,
+      ),
+    "URLs must not contain whitespace or control characters",
+  )
+  .pipe(z.string().url())
   .refine((value) => {
     try {
       const url = new URL(value);
@@ -14,9 +21,6 @@ const sourceUrl = z
         ["reddit.com", "www.reddit.com"].includes(url.hostname) &&
         /^\/r\/bangalorebikes\/comments\/[a-z0-9]+(?:\/|$)/i.test(
           url.pathname,
-        ) &&
-        [...value].every(
-          (char) => char.charCodeAt(0) > 32 && char.charCodeAt(0) !== 127,
         )
       );
     } catch {
