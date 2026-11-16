@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/sheet";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
+import { communityLinks } from "@/lib/community";
 
 interface MenuItem {
   title: string;
@@ -80,10 +81,15 @@ const Navbar = ({
       title: "Wiki",
       url: "/wiki",
     },
+    {
+      title: "Contact",
+      url: "/contact",
+    },
   ],
 }: Navbar1Props) => {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -110,7 +116,7 @@ const Navbar = ({
   return (
     <section
       className={`py-4 px-4 sm:px-8 top-0 fixed w-full z-50 transition-transform duration-300 bg-background/80 backdrop-blur-sm border-b border-border/50 ${
-        isVisible ? "translate-y-0" : "-translate-y-full"
+        isVisible || mobileMenuOpen ? "translate-y-0" : "-translate-y-full"
       }`}
     >
       <div className="w-full lg:max-w-9/12 mx-auto">
@@ -138,10 +144,8 @@ const Navbar = ({
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
-            <Button
-              onClick={() => window.open("https://reddit.com/r/bangalorebikes")}
-            >
-              Join Us
+            <Button asChild>
+              <a href={communityLinks.subreddit}>Join on Reddit</a>
             </Button>
           </div>
         </nav>
@@ -160,10 +164,14 @@ const Navbar = ({
                 height={32}
               />
             </Link>
-            <Sheet>
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Menu className="size-4" />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  aria-label="Open navigation menu"
+                >
+                  <Menu className="size-4" aria-hidden="true" />
                 </Button>
               </SheetTrigger>
               <SheetContent className="overflow-y-auto">
@@ -183,7 +191,17 @@ const Navbar = ({
                     </Link>
                   </SheetTitle>
                 </SheetHeader>
-                <div className="flex flex-col gap-6 p-4">
+                <div
+                  className="flex flex-col gap-6 p-4"
+                  onClick={(event) => {
+                    if (
+                      event.target instanceof Element &&
+                      event.target.closest("a")
+                    ) {
+                      setMobileMenuOpen(false);
+                    }
+                  }}
+                >
                   <Accordion
                     type="single"
                     collapsible
@@ -193,8 +211,8 @@ const Navbar = ({
                   </Accordion>
 
                   <div className="flex flex-col gap-3">
-                    <Button asChild onClick={() => {}}>
-                      Join Us
+                    <Button asChild>
+                      <a href={communityLinks.subreddit}>Join on Reddit</a>
                     </Button>
                   </div>
                 </div>
