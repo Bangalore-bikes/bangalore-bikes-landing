@@ -36,8 +36,18 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <div className="min-h-svh flex flex-col">
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-background focus:px-4 focus:py-3 focus:text-foreground focus:underline"
+              >
+                Skip to content
+              </a>
               <Navbar />
-              <div className="flex grow flex-col px-2 sm:px-8 mt-16 w-full lg:w-3/4 self-center">
+              <div
+                id="main-content"
+                tabIndex={-1}
+                className="flex grow flex-col px-2 sm:px-8 mt-16 w-full lg:w-3/4 self-center scroll-mt-20"
+              >
                 {children}
               </div>
               <Footer />

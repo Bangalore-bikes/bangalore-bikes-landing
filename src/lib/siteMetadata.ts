@@ -25,13 +25,13 @@ export const publicPages = {
   "/rides": {
     title: "Community rides",
     description:
-      "Find where to discuss rides with r/BangaloreBikes. No confirmed upcoming rides are currently listed on the website.",
+      "Browse community ride plans, check dates and meeting points, and follow the original r/BangaloreBikes discussions for updates.",
     index: false,
   },
   "/blogs": {
     title: "Community stories",
     description:
-      "Read ride reports and conversations on r/BangaloreBikes while the website's article collection is being prepared.",
+      "Stories, ride reports, and conversations from the Bangalore Bikes motorcycle community.",
     index: false,
   },
   "/destinations": {
@@ -65,14 +65,20 @@ export const isPreviewDeployment =
   process.env.CONTEXT === "deploy-preview" ||
   process.env.CONTEXT === "branch-deploy";
 
-export function createPageMetadata(path: keyof typeof publicPages): Metadata {
+export function createPageMetadata(
+  path: keyof typeof publicPages,
+  options: { index?: boolean } = {},
+): Metadata {
   const page = publicPages[path];
   const title = path === "/" ? page.title : page.title + " | " + siteName;
   return {
     title: { absolute: title },
     description: page.description,
     alternates: { canonical: siteOrigin + path },
-    robots: { index: page.index && !isPreviewDeployment, follow: true },
+    robots: {
+      index: (options.index ?? page.index) && !isPreviewDeployment,
+      follow: true,
+    },
     openGraph: {
       type: "website",
       siteName,

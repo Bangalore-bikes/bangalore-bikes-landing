@@ -4,7 +4,7 @@ The production origin is https://bangalorebikes.com, as recorded in the project 
 
 All public routes have individual titles, descriptions, canonical URLs, and social previews using the existing hero image. Metadata describes what the page actually offers; it does not claim unpublished articles, confirmed rides, or verified services.
 
-The homepage, resource directory, and contact page are indexable and appear in the sitemap. Unpopulated sections remain accessible with noindex metadata and are excluded from the sitemap. When substantive content is published, update that route's index flag in the shared metadata registry.
+The homepage, resource directory, and contact page are indexable and appear in the sitemap. Ride/story indexes become indexable automatically when their collections are populated. Published article and non-cancelled ride detail URLs are added with update timestamps. Other unpopulated sections remain accessible with noindex metadata and are excluded from the sitemap.
 
 Netlify deploy-preview and branch-deploy contexts receive noindex metadata, crawler exclusion, and an empty sitemap. Canonicals always refer to the production origin.
 

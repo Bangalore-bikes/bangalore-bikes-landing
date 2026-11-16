@@ -1,22 +1,25 @@
 "use client";
 
 import { useId, useState } from "react";
-import { communityResources } from "@/data/community-resources";
+import type { CommunityResource } from "@/lib/resourceSchema";
 import { filterResources } from "@/lib/resourceSearch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CommunityResources } from "./community-resources";
 
-const categories = [
-  "All",
-  ...new Set(communityResources.map((resource) => resource.category)),
-];
-
-export function ResourceDirectory() {
+export function ResourceDirectory({
+  entries,
+}: {
+  entries: readonly CommunityResource[];
+}) {
+  const categories = [
+    "All",
+    ...new Set(entries.map((resource) => resource.category)),
+  ];
   const searchId = useId();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
-  const resources = filterResources(communityResources, query, category);
+  const resources = filterResources(entries, query, category);
   const filtered = query.length > 0 || category !== "All";
 
   function resetFilters() {
@@ -85,9 +88,15 @@ export function ResourceDirectory() {
         <CommunityResources resources={resources} />
       ) : (
         <div className="space-y-2 py-6">
-          <h3 className="text-xl font-semibold">No matching resources</h3>
+          <h3 className="text-xl font-semibold">
+            {entries.length === 0
+              ? "No published resources yet"
+              : "No matching resources"}
+          </h3>
           <p className="text-muted-foreground">
-            Try a different search or clear the filters to see all resources.
+            {entries.length === 0
+              ? "Published community links will appear here as they are added."
+              : "Try a different search or clear the filters to see all resources."}
           </p>
         </div>
       )}

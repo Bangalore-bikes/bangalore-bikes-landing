@@ -121,7 +121,7 @@ const Navbar = ({
     >
       <div className="w-full lg:max-w-9/12 mx-auto">
         {/* Desktop Menu */}
-        <nav className="hidden justify-between lg:flex">
+        <nav aria-label="Primary" className="hidden justify-between lg:flex">
           {/* Logo */}
           <Link href={logo.url} className="flex items-center gap-4">
             <Image

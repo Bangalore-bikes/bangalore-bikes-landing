@@ -1,31 +1,5 @@
-// Editorial links, not a live feed or a moderator-approval record.
-// Discussion and authorship remain on Reddit.
-export const communityResources = [
-  {
-    id: "community-standards",
-    title: "Community standards and respect",
-    category: "Community",
-    summary:
-      "A community notice about inclusion, respectful disagreements, and contacting moderators when something goes wrong.",
-    url: "https://www.reddit.com/r/bangalorebikes/comments/1waqjsy/a_quick_reminder_on_community_standards_respect/",
-    sourceLabel: "Community notice on r/BangaloreBikes",
-  },
-  {
-    id: "member-inboxes",
-    title: "Respecting member inboxes",
-    category: "Community",
-    summary:
-      "A reminder to keep useful questions public, ask permission before messaging members, and report unwanted messages through modmail.",
-    url: "https://www.reddit.com/r/bangalorebikes/comments/1we7dob/community_notice_respecting_member_inboxes_zero/",
-    sourceLabel: "Community notice on r/BangaloreBikes",
-  },
-  {
-    id: "workshop-experience",
-    title: "A rider's workshop experience",
-    category: "Maintenance",
-    summary:
-      "One rider shares a follow-up after trying a workshop suggested by other members. Read the original discussion for context; this is not a verified garage listing.",
-    url: "https://www.reddit.com/r/bangalorebikes/comments/1smqhi8/service_update_with_location/",
-    sourceLabel: "Member discussion on r/BangaloreBikes",
-  },
-] as const;
+import content from "./resources.json";
+import { publishedResources } from "@/lib/resourceSchema";
+
+// Filter drafts on the server before passing content to interactive components.
+export const communityResources = publishedResources(content);

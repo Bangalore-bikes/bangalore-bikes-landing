@@ -18,6 +18,33 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 Check out the [issues](https://github.com/Bangalore-bikes/bangalore-bikes-landing/issues) tab, pick an issue that hasn't been assigned to anyone and you can start contributing
 
-## Deployment
+## Editing community content
+
+Edit [resources.json](./src/data/resources.json) for attributed Reddit resources, [rides.json](./src/data/rides.json) for organizer-confirmed rides, and [articles.json](./src/data/articles.json) for original or permissioned articles. No component edits or API credentials are required.
+
+Resource drafts are omitted from the website; they are not private repository storage. Ride listings must be confirmed before publication. See [content maintenance](./docs/content-maintenance.md) and [ride publishing](./docs/rides.md).
+
+See [article publishing](./docs/articles.md) for structured content, attribution, and publication requirements.
+
+With Node 22.18+:
+
+```bash
+npm run validate:content
+npm run test:content
+npm run test:rides
+npm run test:resources
+npm run typecheck
+npm run lint
+npm run build
+npm run test:seo
+```
+
+SEO checks inspect the production build output, so run them after building.
+
+Run npm test for the combined content, resource-search, and ride unit tests. The [local Storybook guide](./docs/storybook.md) explains component previews and the compatibility launcher.
+
+For local browser smoke checks, build the app, run npm start -- -p 3102 in another terminal, then run npm run test:browser. See the Storybook guide for browser prerequisites and test coverage.
+
+## Hosting
 
 Project is currently hosted at [bangalorebikes.com](https://bangalorebikes.com/) as a [Netlify](https://www.netlify.com/) project.

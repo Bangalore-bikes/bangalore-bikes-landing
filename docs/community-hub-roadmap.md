@@ -1,6 +1,6 @@
 # Bangalore Bikes community hub
 
-Status: milestone 1 implemented on codex/community-foundation; later milestones remain proposed.
+Status: community foundation, initial resource search, discoverability, and ride foundation implemented on codex/community-foundation. Real ride publication and editorial integrations remain pending.
 Date: 2026-11-16
 
 ## Purpose
@@ -10,6 +10,8 @@ Make useful r/BangaloreBikes information easy to find and act on. Reddit stays t
 Success means a visitor can find the next confirmed ride, open its Reddit discussion, locate a relevant resource, and contact moderators without encountering fictional claims or dead controls.
 
 ## Source audit
+
+Initial baseline findings, before the foundation work below. These are not a claim that all listed defects remain present.
 
 - Home ride cards are hard-coded examples without dates or destination links. The rides page advertises January/February 2024 events as upcoming, with invented participation counts and registration buttons that do nothing.
 - Blog cards have invented posts and nonfunctional reading actions. Exposing /blogs fixes routing, not editorial publishing or Notion integration.
@@ -112,3 +114,18 @@ These inputs do not block navigation, empty-state, fake-content, or contact-flow
 - Fixed joining on mobile and desktop, added a menu label, closed mobile navigation on link selection, and removed placeholder social links.
 - Preserved the existing theme and public routes; shared content states use existing UI primitives.
 - No Reddit API integration, publishing backend, verified directory, or real event calendar is claimed by this release.
+
+## Subsequent local feature work
+
+- Seeded three attributed Reddit links with shared homepage/directory rendering; added local search and category filters.
+- Added per-page metadata, production sitemap and crawler rules, preview indexing exclusions, and a helpful 404.
+- Added validated shared ride data, state-aware listings, detail routes, organizer directions, and UTC ICS snapshots with IST displays. See [rides.md](./rides.md) for publication requirements.
+- The published ride collection remains empty. No real event or RSVP flow is claimed.
+- Review, release, commits, and pushing are left to the user for the latest feature work.
+- Content is edited through validated JSON collections, with resource draft/published states, visible source-check dates, duplicate detection, and a local validation command. Draft filtering occurs before data is passed to interactive components.
+- Resources have prefilled correction links to Reddit modmail; they never send messages automatically.
+- Storybook now builds with the compatibility launcher and pinned webpack. It includes resource states, typography/palette examples, and a light/dark toolbar.
+- Focused browser smoke checks cover mobile navigation, joining, resource filters/reset, contact/correction links, overflow, and unknown ride/calendar routes. Full visual regression and accessibility auditing remain outstanding.
+- Added repository-backed articles with draft exclusion, author/permission metadata, structured text rendering, archive/detail pages, homepage placement, and automatic sitemap/indexing behavior. The article collection remains empty until content is supplied.
+- Added isolated Storybook ride-state and article previews. The extended Chrome suite verifies calendar visibility for all four ride states and literal-text rendering; those populated-state smoke checks now pass.
+- Added a keyboard skip-to-content link, a homepage main landmark, and responsive/priority hints for the above-fold banner. Full accessibility auditing and visual regression remain separate work.
