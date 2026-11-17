@@ -1,11 +1,23 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { safeAccountPath } from "../src/lib/auth/redirect.ts";
 
-import {
-  createToken,
-  hashToken,
-  safeEqual,
-} from "../src/lib/auth/tokens.ts";
+test("account redirects stay on this site", () => {
+  for (const value of [
+    "//attacker.example",
+    "/\\attacker.example",
+    "https://attacker.example",
+    "/\n/attacker.example",
+  ]) {
+    assert.equal(safeAccountPath(value), "/drafts");
+  }
+  assert.equal(
+    safeAccountPath("/account/security?tab=mfa"),
+    "/account/security?tab=mfa",
+  );
+});
+
+import { createToken, hashToken, safeEqual } from "../src/lib/auth/tokens.ts";
 
 test("tokens are unguessable and stored hashed", () => {
   const first = createToken();

@@ -99,6 +99,7 @@ export async function POST(
           email: stringField(body, "email"),
           password: stringField(body, "password"),
           ip: clientIp(request),
+          code: stringField(body, "code"),
         });
         return jsonOk({ ok: true, user }, 200, {
           "Set-Cookie": serializeSessionCookie(session, { secure }),

@@ -4,7 +4,7 @@ import { DatabaseSync } from "node:sqlite";
 
 import { createRateLimiter } from "../src/lib/rate-limit.ts";
 
-function fixture(t) {
+function fixture(t, options) {
   const db = new DatabaseSync(":memory:");
   t.after(() => db.close());
   db.exec(`CREATE TABLE rate_limits (
@@ -24,8 +24,24 @@ function fixture(t) {
       throw new Error("rate limiting never batches");
     },
   };
-  return createRateLimiter(client);
+  return createRateLimiter(client, options);
 }
+
+test("limits report the real remaining window and reset only the intended key", async (t) => {
+  let timestamp = 60_000;
+  const limiter = fixture(t, { now: () => timestamp });
+  await limiter.hit("first", 1, 60);
+  timestamp = 119_000;
+  const result = await limiter.hit("first", 1, 60);
+  assert.equal(result.allowed, false);
+  assert.equal(result.retryAfter, 1);
+  await limiter.hit("second", 1, 60);
+  await limiter.reset("first", 60);
+  assert.equal((await limiter.hit("first", 1, 60)).allowed, true);
+  assert.equal((await limiter.hit("second", 1, 60)).allowed, false);
+  timestamp = 120_000;
+  assert.equal((await limiter.hit("second", 1, 60)).allowed, true);
+});
 
 test("the limit is enforced inside a window and keys stay independent", async (t) => {
   const limiter = fixture(t);

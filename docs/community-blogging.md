@@ -120,13 +120,18 @@ verified mailbox rather than a typed one.
 | --- | --- | --- |
 | `TURSO_DATABASE_URL` | yes | the same libSQL database the content admin uses |
 | `TURSO_AUTH_TOKEN` | yes, for a remote database | write token |
-| `RESEND_API_KEY` | yes, to send mail | Resend API key |
+| `BREVO_SMTP_LOGIN` | yes, for Brevo | SMTP login from Brevo, which can differ from your account email |
+| `BREVO_SMTP_KEY` | yes, for Brevo | SMTP key, stored as a hosting secret |
+| `RESEND_API_KEY` | optional alternative | used only when Brevo SMTP is not configured |
 | `MAIL_FROM` | yes, with the key | verified sender, e.g. `Bangalore Bikes <hello@bangalorebikes.com>` |
 | `ADMIN_EMAILS` | yes, to have moderators | comma-separated account emails |
 | `NEXT_PUBLIC_SITE_URL` | recommended | canonical origin used in mail links |
+| `AUTH_ENCRYPTION_KEY` | yes, for MFA setup | random 32-byte key encoded as 64 hexadecimal characters; keep stable and private |
 
-All are server-only. With `RESEND_API_KEY` or `MAIL_FROM` absent, mail is logged and
-the request still succeeds, so local development and CI never fail on email.
+All except `NEXT_PUBLIC_SITE_URL` are server-only. Brevo connects to
+`smtp-relay.brevo.com:587` with mandatory STARTTLS and certificate validation.
+`MAIL_FROM` must be an approved Brevo sender. When neither transport is configured,
+local development logs only recipient domains and never logs message bodies or links.
 
 ## 7. Turning it on
 
@@ -139,13 +144,16 @@ the request still succeeds, so local development and CI never fail on email.
 
 `npm run db:migrate:posts` creates `users`, `sessions`, `email_tokens`, `posts`,
 `post_revisions`, `post_comments`, `post_reactions`, `workshop_reviews`,
-`rate_limits`, `uploads`, the shared `content_audit` table and an FTS5 `posts_fts`
+`rate_limits`, `uploads`, `user_mfa`, `mfa_recovery_codes`, the shared `content_audit` table and an FTS5 `posts_fts`
 index. If the SQLite build lacks FTS5 the index is skipped with a warning and search
 falls back to `LIKE`; nothing else fails.
 
 ## 8. API
 
-All endpoints are JSON, server-only and rate limited. Bodies are capped at 128 KB.
+Writes require JSON and reject browser cross-origin requests. Actual streamed
+bodies are capped at 128 KB, even when Content-Length is missing. Authentication
+and security limits use shared database counters, with IP and account buckets,
+short and long windows, expiry cleanup and Retry-After responses.
 
 | Method | Path | Auth | Notes |
 | --- | --- | --- | --- |
@@ -161,7 +169,21 @@ All endpoints are JSON, server-only and rate limited. Bodies are capped at 128 K
 | PUT | `/api/posts/[id]` | author | requires `expectedVersion` |
 | POST | `/api/posts/[id]/submit` | author | `{ expectedVersion, publish }` |
 | POST | `/api/posts/preview` | rider | renders Markdown, stores nothing |
-| POST | `/api/moderation/[id]` | moderator | `{ action, note }` |
+| POST | `/api/moderation/[id]` | moderator | `{ action, note, expectedVersion }` |
+| GET/POST | `/api/account/security` | session | account security status and authenticated changes |
+
+### Account security
+
+Open `/account/security` from Your posts. Password changes require the current
+password and, when enabled, an authenticator or unused recovery code. MFA setup
+uses a time-based authenticator app and requires confirmation within ten minutes.
+The encrypted setup secret is not enabled until confirmation. Save the ten
+single-use recovery codes shown after enrollment; they cannot be displayed again.
+Codes and setup keys are never stored in browser storage or sent to an external
+QR service. Password/MFA changes sign out all devices and revoke outstanding
+email links. Password resets preserve MFA. Losing both the authenticator and all
+recovery codes requires an owner-assisted recovery process; email alone does not
+turn off MFA. Google and GitHub sign-in are currently coming-soon placeholders.
 
 Errors use one mapping in `src/lib/http.ts`: `400` invalid, `401` unauthenticated,
 `403` wrong user, `404` missing, `409` conflict or wrong state, `429` throttled with

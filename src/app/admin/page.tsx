@@ -40,17 +40,15 @@ function Frame({ children }: { children: React.ReactNode }) {
 function MissingConfig() {
   return (
     <div className="space-y-4 rounded-md border border-border bg-secondary p-6">
-      <h2 className="text-xl font-semibold">Admin is not configured yet</h2>
+      <h2 className="text-xl font-semibold">GitHub sign-in is coming soon</h2>
       <p className="max-w-prose leading-relaxed">
-        Set the server-only environment variables in your hosting project and
-        redeploy. The setup contract is documented in{" "}
-        <code>docs/activation-guide.md</code>: <code>GITHUB_ID</code>,{" "}
-        <code>GITHUB_SECRET</code>, <code>NEXTAUTH_SECRET</code>,{" "}
-        <code>ADMIN_GITHUB_LOGINS</code>, and the database variables{" "}
-        <code>TURSO_DATABASE_URL</code> and <code>TURSO_AUTH_TOKEN</code>.
+        Community accounts use email and password. Sign in to write posts or
+        review submissions if you are a moderator.
       </p>
       <p className="text-sm text-muted-foreground">
-        Never expose these values with a <code>NEXT_PUBLIC_</code> prefix.
+        <Link href="/login" className="underline underline-offset-4">
+          Sign in with email
+        </Link>
       </p>
     </div>
   );

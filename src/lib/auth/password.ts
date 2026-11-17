@@ -18,6 +18,17 @@ const OPTIONS = {
 /** Bounded so a huge form field cannot be turned into a CPU amplifier. */
 export const MAX_PASSWORD_LENGTH = 256;
 
+const COMMON_PASSWORDS = new Set([
+  "passwordpassword",
+  "123456789012",
+  "qwertyuiop12",
+  "letmein12345",
+  "iloveyou1234",
+  "bangalorebikes",
+  "motorcycle12",
+  "changeme1234",
+]);
+
 export async function hashPassword(plain: string): Promise<string> {
   return hash(plain.slice(0, MAX_PASSWORD_LENGTH), OPTIONS);
 }
@@ -46,6 +57,9 @@ export async function verifyPassword(
  */
 export function passwordProblem(password: string): string | null {
   if (password.length < 12) return "Use at least 12 characters";
-  if (password.length > MAX_PASSWORD_LENGTH) return "Use at most 256 characters";
+  if (password.length > MAX_PASSWORD_LENGTH)
+    return "Use at most 256 characters";
+  if (COMMON_PASSWORDS.has(password.trim().toLowerCase()))
+    return "That password is too common to be safe";
   return null;
 }

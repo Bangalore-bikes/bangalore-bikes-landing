@@ -1,18 +1,13 @@
+import { fromHtml } from "hast-util-from-html";
+import { visit } from "unist-util-visit";
+
 export type TocEntry = { id: string; text: string; level: 2 | 3 };
 
-const HEADING = /<h([23])([^>]*)>([\s\S]*?)<\/h\1>/g;
-const ID = /\sid="([^"]+)"/;
+type TextNode = { type: string; value?: string; children?: TextNode[] };
 
-function decode(text: string): string {
-  return text
-    .replace(/<[^>]+>/g, "")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#x27;/g, "'")
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, "&")
-    .trim();
+function textOf(node: TextNode): string {
+  if (node.type === "text") return node.value ?? "";
+  return (node.children ?? []).map(textOf).join("");
 }
 
 /**
@@ -21,11 +16,12 @@ function decode(text: string): string {
  */
 export function collectHeadings(html: string): TocEntry[] {
   const headings: TocEntry[] = [];
-  for (const match of html.matchAll(HEADING)) {
-    const id = ID.exec(match[2])?.[1];
-    const text = decode(match[3]);
-    if (!id || !text) continue;
-    headings.push({ id, text, level: match[1] === "2" ? 2 : 3 });
-  }
+  visit(fromHtml(html, { fragment: true }), "element", (node) => {
+    if (node.tagName !== "h2" && node.tagName !== "h3") return;
+    const id = node.properties.id;
+    const text = textOf(node).trim();
+    if (typeof id !== "string" || !id || !text) return;
+    headings.push({ id, text, level: node.tagName === "h2" ? 2 : 3 });
+  });
   return headings;
 }

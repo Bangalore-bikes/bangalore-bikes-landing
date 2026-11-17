@@ -8,7 +8,6 @@ import {
   consumeEmailToken,
   createSession,
   deleteSessionByTokenHash,
-  deleteSessionsForUser,
   findEmailToken,
   findSessionByTokenHash,
   findUserByEmail,
@@ -19,11 +18,11 @@ import {
   markEmailVerified,
   normalizeEmail,
   touchSession,
-  updatePasswordHash,
   type StoredUser,
   type UserRole,
 } from "./repository.ts";
 import { createToken, hashToken } from "./tokens.ts";
+import { getMfa, verifySecondFactor } from "./mfa.ts";
 
 export type AuthErrorCode =
   | "INVALID_INPUT"
@@ -33,6 +32,7 @@ export type AuthErrorCode =
   | "UNVERIFIED"
   | "DISABLED"
   | "EMAIL_TAKEN"
+  | "MFA_REQUIRED"
   | "THROTTLED"
   | "NOT_CONFIGURED";
 
@@ -63,21 +63,6 @@ export const SESSION_DAYS = 30;
 const VERIFY_HOURS = 24;
 const RESET_MINUTES = 60;
 const DAY_MS = 24 * 60 * 60 * 1000;
-
-/**
- * A short deny list, not a password-strength oracle. Length is the rule that
- * matters; this only stops the handful of passwords that are guessed first.
- */
-const COMMON_PASSWORDS = new Set([
-  "passwordpassword",
-  "123456789012",
-  "qwertyuiop12",
-  "letmein12345",
-  "iloveyou1234",
-  "bangalorebikes",
-  "motorcycle12",
-  "changeme1234",
-]);
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -112,6 +97,7 @@ export function createAuthService(options: {
   mail: Mailer;
   baseUrl: string;
   adminEmails?: string[];
+  encryptionKey?: string;
   now?: () => Date;
 }) {
   const { client, mail } = options;
@@ -130,16 +116,21 @@ export function createAuthService(options: {
       throw new AuthError(
         "THROTTLED",
         "Too many attempts. Wait a few minutes and try again.",
-        windowSeconds,
+        result.retryAfter,
       );
     }
   }
 
-  async function issueSession(userId: string): Promise<string> {
+  async function issueSession(
+    user: StoredUser,
+    mfaChangeId: string,
+  ): Promise<string> {
     const issued = createToken();
     const issuedAt = now();
     await createSession(client, {
-      userId,
+      userId: user.id,
+      observedPasswordHash: user.passwordHash,
+      observedMfaChangeId: mfaChangeId,
       tokenHash: issued.hash,
       createdAt: issuedAt.toISOString(),
       expiresAt: new Date(
@@ -177,6 +168,11 @@ export function createAuthService(options: {
         900,
       );
       await throttle(`signup:acct:${hashToken(email).slice(0, 32)}`, 3, 900);
+      await throttle(
+        `signup:daily:${hashToken(input.ip?.trim() || "unknown").slice(0, 32)}`,
+        15,
+        86_400,
+      );
       const displayName = input.displayName.trim();
       if (!EMAIL.test(email)) {
         throw new AuthError("INVALID_INPUT", "Enter a valid email address");
@@ -189,12 +185,6 @@ export function createAuthService(options: {
       }
       const problem = passwordProblem(input.password);
       if (problem) throw new AuthError("WEAK_PASSWORD", problem);
-      if (COMMON_PASSWORDS.has(input.password.trim().toLowerCase())) {
-        throw new AuthError(
-          "WEAK_PASSWORD",
-          "That password is too common to be safe",
-        );
-      }
       if (await findUserByEmail(client, email)) {
         throw new AuthError(
           "EMAIL_TAKEN",
@@ -277,9 +267,15 @@ export function createAuthService(options: {
       );
       const user = await findUserById(client, stored.userId);
       if (!user) throw new AuthError("INVALID_TOKEN", "That link is not valid");
+      const mfa = await getMfa(client, user.id);
+      if (mfa?.enabled_at)
+        throw new AuthError(
+          "MFA_REQUIRED",
+          "Email confirmed. Sign in with your authenticator code.",
+        );
       return {
         user: toSessionUser(user),
-        session: await issueSession(user.id),
+        session: await issueSession(user, mfa ? String(mfa.change_id) : ""),
       };
     },
 
@@ -287,12 +283,14 @@ export function createAuthService(options: {
       email: string;
       password: string;
       ip?: string;
+      code?: string;
     }): Promise<{ user: SessionUser; session: string }> {
       const email = normalizeEmail(input.email);
-      const ip = input.ip?.trim();
+      const ip = input.ip?.trim() || "unknown";
       const accountKey = `login:acct:${hashToken(email).slice(0, 32)}`;
+      await throttle(`login:burst:${hashToken(ip).slice(0, 32)}`, 10, 60);
+      await throttle(`login:ip:${hashToken(ip).slice(0, 32)}`, 20, 900);
       await throttle(accountKey, 5, 900);
-      if (ip) await throttle(`login:ip:${hashToken(ip).slice(0, 32)}`, 20, 900);
 
       const user = await findUserByEmail(client, email);
       if (!user) {
@@ -317,9 +315,29 @@ export function createAuthService(options: {
           "Confirm your email address before signing in. Check your inbox for the link.",
         );
       }
+      const factor = await verifySecondFactor(
+        client,
+        user.id,
+        input.code,
+        options.encryptionKey ?? process.env.AUTH_ENCRYPTION_KEY,
+        now(),
+      );
+      if (factor.required && !input.code?.trim()) {
+        throw new AuthError(
+          "MFA_REQUIRED",
+          "Enter your authenticator code or an unused recovery code.",
+        );
+      }
+      if (!factor.valid)
+        throw new AuthError(
+          "INVALID_CREDENTIALS",
+          "That code is invalid or has already been used.",
+        );
+      const session = await issueSession(user, factor.changeId);
+      await limiter.reset(accountKey, 900);
       return {
         user: toSessionUser(user),
-        session: await issueSession(user.id),
+        session,
       };
     },
 
@@ -354,13 +372,11 @@ export function createAuthService(options: {
      */
     async requestReset(input: { email: string; ip?: string }): Promise<void> {
       const email = normalizeEmail(input.email);
-      if (input.ip?.trim()) {
-        await throttle(
-          `reset:ip:${hashToken(input.ip.trim()).slice(0, 32)}`,
-          5,
-          900,
-        );
-      }
+      await throttle(
+        `reset:ip:${hashToken(input.ip?.trim() || "unknown").slice(0, 32)}`,
+        5,
+        900,
+      );
       if (!EMAIL.test(email)) return;
       await throttle(`reset:acct:${hashToken(email).slice(0, 32)}`, 3, 900);
 
@@ -394,12 +410,6 @@ export function createAuthService(options: {
     }): Promise<void> {
       const problem = passwordProblem(input.password);
       if (problem) throw new AuthError("WEAK_PASSWORD", problem);
-      if (COMMON_PASSWORDS.has(input.password.trim().toLowerCase())) {
-        throw new AuthError(
-          "WEAK_PASSWORD",
-          "That password is too common to be safe",
-        );
-      }
 
       const stored = await findEmailToken(
         client,
@@ -415,19 +425,35 @@ export function createAuthService(options: {
           "That link has expired. Request a new one.",
         );
       }
-      if (
-        !(await consumeEmailToken(client, stored.id, current.toISOString()))
-      ) {
-        throw new AuthError("INVALID_TOKEN", "That link has already been used");
-      }
-
-      await updatePasswordHash(
-        client,
-        stored.userId,
-        await hashPassword(input.password),
+      // Hash first, then check the still-valid token and mutate atomically.
+      const nextHash = await hashPassword(input.password);
+      const results = await client.batch(
+        [
+          {
+            sql: `UPDATE users SET password_hash = ? WHERE id = ? AND disabled_at IS NULL
+            AND EXISTS (SELECT 1 FROM email_tokens WHERE id = ? AND user_id = users.id
+              AND purpose = 'reset' AND token_hash = ? AND used_at IS NULL AND expires_at > ?)
+            RETURNING id`,
+            args: [
+              nextHash,
+              stored.userId,
+              stored.id,
+              hashToken(input.token),
+              now().toISOString(),
+            ],
+          },
+          ...["sessions", "email_tokens"].map((table) => ({
+            sql: `DELETE FROM ${table} WHERE user_id = ? AND EXISTS (SELECT 1 FROM users WHERE id = ? AND password_hash = ?)`,
+            args: [stored.userId, stored.userId, nextHash],
+          })),
+        ],
+        "write",
       );
-      // A reset is the moment to cut off anything already holding a session.
-      await deleteSessionsForUser(client, stored.userId);
+      if (!results[0].rows.length)
+        throw new AuthError(
+          "INVALID_TOKEN",
+          "That link has expired or has already been used.",
+        );
     },
   };
 }

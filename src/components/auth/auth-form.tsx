@@ -7,7 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export type AuthMode = "signup" | "login" | "reset-request" | "reset-complete" | "verify";
+export type AuthMode =
+  | "signup"
+  | "login"
+  | "reset-request"
+  | "reset-complete"
+  | "verify";
 
 const ACTIONS: Record<AuthMode, string> = {
   signup: "signup",
@@ -38,6 +43,7 @@ export function AuthForm({
 }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
+  const [mfaRequired, setMfaRequired] = useState(false);
   const [status, setStatus] = useState<Status>({ kind: "idle", message: "" });
   const verified = useRef(false);
 
@@ -53,11 +59,15 @@ export function AuthForm({
       const data = (await response.json().catch(() => ({}))) as {
         message?: string;
         issues?: string[];
+        code?: string;
       };
       if (!response.ok) {
+        if (data.code === "MFA_REQUIRED") setMfaRequired(true);
         setStatus({
           kind: "error",
-          message: data.issues?.length ? data.issues.join(". ") : (data.message ?? "That did not work"),
+          message: data.issues?.length
+            ? data.issues.join(". ")
+            : (data.message ?? "That did not work"),
         });
         return;
       }
@@ -71,7 +81,10 @@ export function AuthForm({
         router.refresh();
       }
     } catch {
-      setStatus({ kind: "error", message: "The network dropped the request. Try again." });
+      setStatus({
+        kind: "error",
+        message: "The network dropped the request. Try again.",
+      });
     } finally {
       setPending(false);
     }
@@ -139,7 +152,9 @@ export function AuthForm({
             id="password"
             name="password"
             type="password"
-            autoComplete={mode === "login" ? "current-password" : "new-password"}
+            autoComplete={
+              mode === "login" ? "current-password" : "new-password"
+            }
             required
             minLength={mode === "login" ? 1 : 12}
             className="h-11"
@@ -152,18 +167,69 @@ export function AuthForm({
         </div>
       )}
 
+      {mode === "login" && mfaRequired && (
+        <div className="space-y-2">
+          <Label htmlFor="login-code">Authenticator or recovery code</Label>
+          <Input
+            id="login-code"
+            name="code"
+            autoComplete="one-time-code"
+            className="h-11"
+            required
+            maxLength={64}
+          />
+          <p className="text-sm text-muted-foreground">
+            Enter a new six-digit code from your authenticator, or one of your
+            unused recovery codes.
+          </p>
+        </div>
+      )}
+
       <div aria-live="polite" className="min-h-6 text-sm">
         {status.kind === "error" && (
           <p role="alert" className="text-destructive">
             {status.message}
           </p>
         )}
-        {status.kind === "success" && <p className="text-foreground">{status.message}</p>}
+        {status.kind === "success" && (
+          <p className="text-foreground">{status.message}</p>
+        )}
       </div>
 
-      <Button type="submit" className="h-11 w-full" disabled={pending || (mode === "verify" && !token)}>
+      <Button
+        type="submit"
+        className="h-11 w-full"
+        disabled={pending || (mode === "verify" && !token)}
+      >
         {pending ? copy.pending : copy.submit}
       </Button>
+
+      {(mode === "login" || mode === "signup") && (
+        <div className="space-y-3 border-t pt-5">
+          <p className="text-sm text-muted-foreground">
+            More ways to sign in are on the way. Use your email and password for
+            now.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11"
+              disabled
+            >
+              Google · Coming soon
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11"
+              disabled
+            >
+              GitHub · Coming soon
+            </Button>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

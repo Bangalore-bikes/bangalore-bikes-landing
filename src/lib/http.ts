@@ -1,5 +1,6 @@
 import { AuthError } from "./auth/service.ts";
 import { PostError } from "./posts/repository.ts";
+import { SecurityError } from "./auth/mfa.ts";
 
 const NO_STORE = { "Cache-Control": "no-store" } as const;
 
@@ -24,6 +25,19 @@ export function jsonOk(
  * a conflict with 409 and a missing row with 404 instead of drifting.
  */
 export function errorResponse(error: unknown): Response {
+  if (error instanceof SecurityError) {
+    return jsonError(
+      {
+        INVALID_INPUT: 400,
+        INVALID_CREDENTIALS: 401,
+        MFA_REQUIRED: 401,
+        CONFLICT: 409,
+        NOT_CONFIGURED: 503,
+      }[error.code],
+      error.message,
+      { code: error.code },
+    );
+  }
   if (error instanceof PostError) {
     switch (error.code) {
       case "INVALID_INPUT":
@@ -50,10 +64,15 @@ export function errorResponse(error: unknown): Response {
       EMAIL_TAKEN: 409,
       THROTTLED: 429,
       NOT_CONFIGURED: 503,
+      MFA_REQUIRED: 401,
     }[error.code];
     const headers: Record<string, string> = { ...NO_STORE };
-    if (error.code === "THROTTLED") headers["Retry-After"] = String(error.retryAfter ?? 900);
-    return Response.json({ message: error.message }, { status, headers });
+    if (error.code === "THROTTLED")
+      headers["Retry-After"] = String(error.retryAfter ?? 900);
+    return Response.json(
+      { message: error.message, code: error.code },
+      { status, headers },
+    );
   }
 
   const message = error instanceof Error ? error.message : String(error);
@@ -80,13 +99,49 @@ export const MAX_JSON_BYTES = 131_072;
 export async function readJson(
   request: Request,
 ): Promise<Record<string, unknown> | null> {
+  if (
+    request.headers.get("content-type")?.split(";")[0].trim().toLowerCase() !==
+    "application/json"
+  )
+    return null;
+  const origin = request.headers.get("origin");
+  if (
+    (origin && origin !== new URL(request.url).origin) ||
+    request.headers.get("sec-fetch-site") === "cross-site"
+  )
+    return null;
   const length = Number(request.headers.get("content-length") ?? "0");
   if (Number.isFinite(length) && length > MAX_JSON_BYTES) return null;
+  if (!request.body) return null;
+  const reader = request.body.getReader();
   try {
-    const value: unknown = await request.json();
-    if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+    const chunks: Uint8Array[] = [];
+    let total = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > MAX_JSON_BYTES) {
+        void reader.cancel().catch(() => {});
+        return null;
+      }
+      chunks.push(value);
+    }
+    const bytes = new Uint8Array(total);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    const value: unknown = JSON.parse(
+      new TextDecoder("utf-8", { fatal: true }).decode(bytes),
+    );
+    if (!value || typeof value !== "object" || Array.isArray(value))
+      return null;
     return value as Record<string, unknown>;
   } catch {
     return null;
+  } finally {
+    reader.releaseLock();
   }
 }

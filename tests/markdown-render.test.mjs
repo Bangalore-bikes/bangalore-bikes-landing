@@ -2,6 +2,19 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { renderMarkdown } from "../src/lib/markdown/render.ts";
+import { collectHeadings } from "../src/lib/markdown/toc.ts";
+
+test("contents labels use parsed text, including nested markup and character references", () => {
+  assert.deepEqual(
+    collectHeadings(
+      '<h2 id="route">A <em>ride</em> &#x1f3cd; &amp; &#169;</h2><h3 id="warning">&lt;script&gt; stays text</h3>',
+    ),
+    [
+      { id: "route", text: "A ride 🏍 & ©", level: 2 },
+      { id: "warning", text: "<script> stays text", level: 3 },
+    ],
+  );
+});
 
 test("headings, lists and GFM tables render with a table of contents", async () => {
   const { html, headings } = await renderMarkdown(

@@ -1,6 +1,11 @@
 import { randomUUID } from "node:crypto";
 
-import type { SqlClient, SqlResult, SqlStatement, SqlValue } from "../content-store.ts";
+import type {
+  SqlClient,
+  SqlResult,
+  SqlStatement,
+  SqlValue,
+} from "../content-store.ts";
 import type { TrustLevel } from "../posts/lifecycle.ts";
 import { slugify, uniqueSlug } from "../posts/slugs.ts";
 
@@ -32,7 +37,10 @@ export type StoredSession = {
 
 export type TokenPurpose = "verify" | "reset";
 
-const statement = (sql: string, args: SqlValue[] = []): SqlStatement => ({ sql, args });
+const statement = (sql: string, args: SqlValue[] = []): SqlStatement => ({
+  sql,
+  args,
+});
 
 export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -42,7 +50,8 @@ function toUser(row: SqlResult["rows"][number]): StoredUser {
   return {
     id: String(row.id),
     email: String(row.email),
-    emailVerifiedAt: row.email_verified_at == null ? null : String(row.email_verified_at),
+    emailVerifiedAt:
+      row.email_verified_at == null ? null : String(row.email_verified_at),
     passwordHash: String(row.password_hash),
     handle: String(row.handle),
     displayName: String(row.display_name),
@@ -71,7 +80,9 @@ export async function findUserById(
   client: SqlClient,
   id: string,
 ): Promise<StoredUser | null> {
-  const result = await client.execute(statement("SELECT * FROM users WHERE id = ?", [id]));
+  const result = await client.execute(
+    statement("SELECT * FROM users WHERE id = ?", [id]),
+  );
   return result.rows[0] ? toUser(result.rows[0]) : null;
 }
 
@@ -80,7 +91,9 @@ export async function findUserByHandle(
   handle: string,
 ): Promise<StoredUser | null> {
   const result = await client.execute(
-    statement("SELECT * FROM users WHERE handle = ?", [handle.trim().toLowerCase()]),
+    statement("SELECT * FROM users WHERE handle = ?", [
+      handle.trim().toLowerCase(),
+    ]),
   );
   return result.rows[0] ? toUser(result.rows[0]) : null;
 }
@@ -99,7 +112,10 @@ export async function allocateHandle(
       `${base}-%`,
     ]),
   );
-  return uniqueSlug(base.slice(0, 24), taken.rows.map((row) => String(row.handle)));
+  return uniqueSlug(
+    base.slice(0, 24),
+    taken.rows.map((row) => String(row.handle)),
+  );
 }
 
 export async function insertUser(
@@ -160,22 +176,48 @@ export async function updatePasswordHash(
   passwordHash: string,
 ): Promise<void> {
   await client.execute(
-    statement("UPDATE users SET password_hash = ? WHERE id = ?", [passwordHash, userId]),
+    statement("UPDATE users SET password_hash = ? WHERE id = ?", [
+      passwordHash,
+      userId,
+    ]),
   );
 }
 
 export async function createSession(
   client: SqlClient,
-  input: { userId: string; tokenHash: string; createdAt: string; expiresAt: string },
+  input: {
+    userId: string;
+    tokenHash: string;
+    createdAt: string;
+    expiresAt: string;
+    observedPasswordHash?: string;
+    observedMfaChangeId?: string;
+  },
 ): Promise<string> {
   const id = randomUUID();
-  await client.execute(
+  const result = await client.execute(
     statement(
       `INSERT INTO sessions (id, user_id, token_hash, created_at, expires_at, last_seen_at)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [id, input.userId, input.tokenHash, input.createdAt, input.expiresAt, input.createdAt],
+       SELECT ?, id, ?, ?, ?, ? FROM users WHERE id = ? AND disabled_at IS NULL
+         AND (? IS NULL OR password_hash = ?)
+         AND (? IS NULL OR COALESCE((SELECT change_id FROM user_mfa WHERE user_id = users.id), '') = ?)
+       RETURNING id`,
+      [
+        id,
+        input.tokenHash,
+        input.createdAt,
+        input.expiresAt,
+        input.createdAt,
+        input.userId,
+        input.observedPasswordHash ?? null,
+        input.observedPasswordHash ?? null,
+        input.observedMfaChangeId ?? null,
+        input.observedMfaChangeId ?? null,
+      ],
     ),
   );
+  if (!result.rows.length)
+    throw new Error("Account security changed while signing in");
   return id;
 }
 
@@ -229,7 +271,9 @@ export async function deleteSessionsForUser(
   client: SqlClient,
   userId: string,
 ): Promise<void> {
-  await client.execute(statement("DELETE FROM sessions WHERE user_id = ?", [userId]));
+  await client.execute(
+    statement("DELETE FROM sessions WHERE user_id = ?", [userId]),
+  );
 }
 
 export async function insertEmailToken(

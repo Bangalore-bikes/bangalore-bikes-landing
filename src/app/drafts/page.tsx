@@ -48,9 +48,14 @@ export default async function DraftsPage() {
               : "Your posts publish immediately."}
           </p>
         </div>
-        <Button asChild className="h-11">
-          <Link href="/write">Write a new post</Link>
-        </Button>
+        <div className="flex flex-wrap gap-3">
+          <Button asChild variant="outline" className="h-11">
+            <Link href="/account/security">Account security</Link>
+          </Button>
+          <Button asChild className="h-11">
+            <Link href="/write">Write a new post</Link>
+          </Button>
+        </div>
       </header>
 
       <DraftsList drafts={drafts} />

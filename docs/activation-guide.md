@@ -146,6 +146,55 @@ Do not assume this is zero-cost. Review database/storage/read/write/recovery lim
 
 ## 10. Community publishing: rider accounts and posts
 
+### Current setup: Brevo SMTP and email/password
+
+The owner selected Brevo instead of Resend and deferred Google/GitHub OAuth.
+Rider accounts and post moderation do not need OAuth credentials. `/admin` shows
+a coming-soon state; email/password moderators use `/moderation`.
+
+Set `BREVO_SMTP_LOGIN`, `BREVO_SMTP_KEY`, `MAIL_FROM`, `ADMIN_EMAILS`,
+`NEXT_PUBLIC_SITE_URL`, and `AUTH_ENCRYPTION_KEY` for production, alongside the
+database URL/token. The encryption key is 32 random bytes represented by 64 hex
+characters; store it as a secret and preserve it across deployments. Rotating or
+losing it makes existing authenticator secrets unreadable. Never use a password
+as the encryption key.
+
+Brevo SMTP uses `smtp-relay.brevo.com`, port 587, required STARTTLS and a verified
+sender. The SMTP login is supplied by Brevo and may differ from the account email.
+A successful SMTP acceptance is evidence of queuing, not proof of inbox delivery.
+
+On Windows, the official source can be installed with the already-installed Go:
+
+```powershell
+go install github.com/tursodatabase/turso-cli/cmd/turso@latest
+turso --version
+turso auth login
+```
+
+The Go build may identify itself as `dev`; `go version -m` shows the installed
+release module. The shell installer requires Linux/WSL; running it under Windows
+Git Bash does not make it a supported installation environment.
+
+The authenticated Vercel CLI can provision Turso's free Starter product:
+
+```sh
+vercel integration add tursocloud/database --name bangalore-bikes-production --billing-plan starter --meta region=bom1 --environment production --no-env-pull --scope krithikmcodes-projects
+```
+
+Vercel requires the account owner to accept Marketplace terms before creation.
+Its CLI explicitly rejects acceptance by an AI agent. Do not bypass that check.
+Use only Production for the production database. Do not connect it to arbitrary
+Preview deployments. Initialize managed content before community tables:
+`npm run db:migrate`, then `npm run db:migrate:posts`. Confirm the exact target
+database before either command. MFA enrollment is completed by the account owner
+under `/account/security`; do not mark it enabled before they prove possession.
+
+The active Vercel production alias is `https://bangalorebikes.vercel.app`.
+`bangalorebikes.com` is not attached to that project. Mail links must use the real
+attached origin until domain ownership/routing is configured.
+
+The Resend instructions below remain an alternative, not the current setup.
+
 This is a separate surface from the GitHub admin panel. It uses the same libSQL
 database, and is inert until the steps below are done.
 

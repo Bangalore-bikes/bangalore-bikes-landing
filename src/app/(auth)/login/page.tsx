@@ -4,10 +4,12 @@ import { redirect } from "next/navigation";
 
 import { AuthForm } from "@/components/auth/auth-form";
 import { getServerUser } from "@/lib/auth/server";
+import { safeAccountPath } from "@/lib/auth/redirect";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: "Sign in to write, publish and discuss ride reports on Bangalore Bikes.",
+  description:
+    "Sign in to write, publish and discuss ride reports on Bangalore Bikes.",
 };
 
 export const dynamic = "force-dynamic";
@@ -20,15 +22,15 @@ export default async function LoginPage({
   const user = await getServerUser();
   if (user) redirect("/drafts");
   const { next } = await searchParams;
-  const target = next && next.startsWith("/") ? next : "/drafts";
+  const target = safeAccountPath(next);
 
   return (
     <>
       <header className="space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight">Sign in</h1>
         <p className="text-muted-foreground">
-          Riders write here with an email address and a password, the way a forum has
-          always worked.
+          Riders write here with an email address and a password, the way a
+          forum has always worked.
         </p>
       </header>
 

@@ -1,3 +1,5 @@
+import nodemailer from "nodemailer";
+
 export type MailMessage = {
   to: string;
   subject: string;
@@ -44,9 +46,71 @@ function toHtml(message: MailMessage): string {
   return `<!doctype html><html><body style="font-family:system-ui,sans-serif;line-height:1.6;color:#1c1b19">${paragraphs}</body></html>`;
 }
 
-export function createMailer(env: NodeJS.ProcessEnv = process.env): Mailer {
+type SmtpOptions = {
+  host: string;
+  port: number;
+  secure: boolean;
+  requireTLS: boolean;
+  auth: { user: string; pass: string };
+  connectionTimeout: number;
+  greetingTimeout: number;
+  socketTimeout: number;
+  disableFileAccess: boolean;
+  disableUrlAccess: boolean;
+};
+
+export function createMailer(
+  env: NodeJS.ProcessEnv = process.env,
+  transport: {
+    createTransport(options: SmtpOptions): {
+      sendMail(message: {
+        from: string;
+        to: string;
+        subject: string;
+        text: string;
+        html: string;
+      }): Promise<unknown>;
+    };
+  } = nodemailer,
+): Mailer {
   const apiKey = env.RESEND_API_KEY?.trim();
   const from = env.MAIL_FROM?.trim();
+  const smtpLogin = env.BREVO_SMTP_LOGIN?.trim();
+  const smtpKey = env.BREVO_SMTP_KEY?.trim();
+
+  if (smtpLogin && smtpKey && from) {
+    const smtp = transport.createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      secure: false,
+      requireTLS: true,
+      auth: { user: smtpLogin, pass: smtpKey },
+      connectionTimeout: 10_000,
+      greetingTimeout: 10_000,
+      socketTimeout: 15_000,
+      disableFileAccess: true,
+      disableUrlAccess: true,
+    });
+    return {
+      configured: true,
+      async send(message) {
+        try {
+          await smtp.sendMail({
+            from,
+            to: message.to,
+            subject: message.subject,
+            text: message.text,
+            html: message.html ?? toHtml(message),
+          });
+        } catch {
+          // SMTP errors can echo recipient or credentials. Keep them private.
+          throw new Error(
+            "Email delivery failed. Check the Brevo sender and SMTP configuration.",
+          );
+        }
+      },
+    };
+  }
 
   if (!apiKey || !from) {
     return {
@@ -80,7 +144,9 @@ export function createMailer(env: NodeJS.ProcessEnv = process.env): Mailer {
 
       if (!response.ok) {
         // The body may echo the recipient, so only the status is logged.
-        throw new Error(`Resend rejected the message with status ${response.status}`);
+        throw new Error(
+          `Resend rejected the message with status ${response.status}`,
+        );
       }
     },
   };

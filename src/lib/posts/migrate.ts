@@ -36,6 +36,21 @@ const DDL = [
   )`,
   `CREATE INDEX IF NOT EXISTS sessions_user ON sessions(user_id)`,
 
+  `CREATE TABLE IF NOT EXISTS user_mfa (
+    user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    secret_encrypted TEXT,
+    enabled_at TEXT,
+    last_counter INTEGER NOT NULL DEFAULT -1,
+    pending_secret TEXT,
+    pending_expires_at TEXT,
+    change_id TEXT NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS mfa_recovery_codes (
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    code_hash TEXT NOT NULL,
+    PRIMARY KEY (user_id, code_hash)
+  )`,
+
   `CREATE TABLE IF NOT EXISTS email_tokens (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -161,11 +176,16 @@ const FTS_DDL = `CREATE VIRTUAL TABLE IF NOT EXISTS posts_fts USING fts5(
 
 export type MigrationReport = { fts: boolean };
 
-export async function migratePosts(client: SqlClient): Promise<MigrationReport> {
+export async function migratePosts(
+  client: SqlClient,
+): Promise<MigrationReport> {
   await client.batch(
     DDL.map((sql) => ({ sql })),
     "write",
   );
+  await client.execute({
+    sql: "CREATE INDEX IF NOT EXISTS rate_limits_expiry ON rate_limits(window_start)",
+  });
 
   try {
     await client.execute({ sql: FTS_DDL });

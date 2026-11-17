@@ -79,4 +79,16 @@ test("a saved draft accepts versioned edits and refuses stale saves", async () =
   );
   assert.equal((await response.json()).post.version, 2);
   assert.equal((await PUT(request(), context)).status, 409);
+
+  const securityRoute = await import("../src/app/api/account/security/route.ts");
+  assert.equal((await securityRoute.GET(new Request("https://example.com/api/account/security"))).status, 401);
+  const securityRequest = (password) => new Request("https://example.com/api/account/security", {
+    method: "POST", headers: { "Content-Type": "application/json", Cookie: `bb_session=${session}` },
+    body: JSON.stringify({ action: "change-password", password, newPassword: "a new long route passphrase" }),
+  });
+  assert.equal((await securityRoute.POST(securityRequest("wrong password"))).status, 401);
+  const changed = await securityRoute.POST(securityRequest("a long route passphrase"));
+  assert.equal(changed.status, 200);
+  assert.match(changed.headers.get("set-cookie"), /Max-Age=0/);
+  assert.equal((await PUT(request(), context)).status, 401);
 });
