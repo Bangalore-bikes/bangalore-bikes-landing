@@ -42,6 +42,9 @@ cannot drift.
 
 Editing a post that is already visible puts it back through the trust decision:
 a level-0 author's published post returns to review, a trusted author's stays live.
+Posts retracted by a moderator stay unpublished while edited and must pass review
+when resubmitted, even for trusted authors. Moderation decisions require the
+version shown in the queue; changes made during review require a fresh review.
 
 ## 3. Statuses
 

@@ -142,7 +142,9 @@ export function createAuthService(options: {
       userId,
       tokenHash: issued.hash,
       createdAt: issuedAt.toISOString(),
-      expiresAt: new Date(issuedAt.getTime() + SESSION_DAYS * DAY_MS).toISOString(),
+      expiresAt: new Date(
+        issuedAt.getTime() + SESSION_DAYS * DAY_MS,
+      ).toISOString(),
     });
     return issued.token;
   }
@@ -166,22 +168,38 @@ export function createAuthService(options: {
       email: string;
       password: string;
       displayName: string;
+      ip?: string;
     }): Promise<{ user: SessionUser; mailSent: boolean }> {
       const email = normalizeEmail(input.email);
+      await throttle(
+        `signup:ip:${hashToken(input.ip?.trim() || "unknown").slice(0, 32)}`,
+        5,
+        900,
+      );
+      await throttle(`signup:acct:${hashToken(email).slice(0, 32)}`, 3, 900);
       const displayName = input.displayName.trim();
       if (!EMAIL.test(email)) {
         throw new AuthError("INVALID_INPUT", "Enter a valid email address");
       }
       if (displayName.length < 2 || displayName.length > 60) {
-        throw new AuthError("INVALID_INPUT", "Use a display name of 2 to 60 characters");
+        throw new AuthError(
+          "INVALID_INPUT",
+          "Use a display name of 2 to 60 characters",
+        );
       }
       const problem = passwordProblem(input.password);
       if (problem) throw new AuthError("WEAK_PASSWORD", problem);
       if (COMMON_PASSWORDS.has(input.password.trim().toLowerCase())) {
-        throw new AuthError("WEAK_PASSWORD", "That password is too common to be safe");
+        throw new AuthError(
+          "WEAK_PASSWORD",
+          "That password is too common to be safe",
+        );
       }
       if (await findUserByEmail(client, email)) {
-        throw new AuthError("EMAIL_TAKEN", "An account already uses that email address");
+        throw new AuthError(
+          "EMAIL_TAKEN",
+          "An account already uses that email address",
+        );
       }
 
       const passwordHash = await hashPassword(input.password);
@@ -198,7 +216,10 @@ export function createAuthService(options: {
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         if (/UNIQUE constraint failed: users\.(email|handle)/i.test(message)) {
-          throw new AuthError("EMAIL_TAKEN", "An account already uses that email address");
+          throw new AuthError(
+            "EMAIL_TAKEN",
+            "An account already uses that email address",
+          );
         }
         throw error;
       }
@@ -210,7 +231,9 @@ export function createAuthService(options: {
         purpose: "verify",
         tokenHash: issued.hash,
         createdAt: createdAt.toISOString(),
-        expiresAt: new Date(createdAt.getTime() + VERIFY_HOURS * 60 * 60 * 1000).toISOString(),
+        expiresAt: new Date(
+          createdAt.getTime() + VERIFY_HOURS * 60 * 60 * 1000,
+        ).toISOString(),
       });
 
       const template = verificationMail({
@@ -224,18 +247,28 @@ export function createAuthService(options: {
     },
 
     /** Single use, and a success also signs the author in. */
-    async verifyEmail(token: string): Promise<{ user: SessionUser; session: string }> {
+    async verifyEmail(
+      token: string,
+    ): Promise<{ user: SessionUser; session: string }> {
       const stored = await findEmailToken(client, hashToken(token), "verify");
       const current = now();
-      if (!stored) throw new AuthError("INVALID_TOKEN", "That link is not valid");
+      if (!stored)
+        throw new AuthError("INVALID_TOKEN", "That link is not valid");
       if (new Date(stored.expiresAt).getTime() <= current.getTime()) {
-        throw new AuthError("INVALID_TOKEN", "That link has expired. Request a new one.");
+        throw new AuthError(
+          "INVALID_TOKEN",
+          "That link has expired. Request a new one.",
+        );
       }
-      if (!(await consumeEmailToken(client, stored.id, current.toISOString()))) {
+      if (
+        !(await consumeEmailToken(client, stored.id, current.toISOString()))
+      ) {
         throw new AuthError("INVALID_TOKEN", "That link has already been used");
       }
 
-      const isModerator = admins.has((await findUserById(client, stored.userId))?.email ?? "");
+      const isModerator = admins.has(
+        (await findUserById(client, stored.userId))?.email ?? "",
+      );
       await markEmailVerified(
         client,
         stored.userId,
@@ -244,7 +277,10 @@ export function createAuthService(options: {
       );
       const user = await findUserById(client, stored.userId);
       if (!user) throw new AuthError("INVALID_TOKEN", "That link is not valid");
-      return { user: toSessionUser(user), session: await issueSession(user.id) };
+      return {
+        user: toSessionUser(user),
+        session: await issueSession(user.id),
+      };
     },
 
     async logIn(input: {
@@ -281,7 +317,10 @@ export function createAuthService(options: {
           "Confirm your email address before signing in. Check your inbox for the link.",
         );
       }
-      return { user: toSessionUser(user), session: await issueSession(user.id) };
+      return {
+        user: toSessionUser(user),
+        session: await issueSession(user.id),
+      };
     },
 
     async logOut(token: string): Promise<void> {
@@ -316,7 +355,11 @@ export function createAuthService(options: {
     async requestReset(input: { email: string; ip?: string }): Promise<void> {
       const email = normalizeEmail(input.email);
       if (input.ip?.trim()) {
-        await throttle(`reset:ip:${hashToken(input.ip.trim()).slice(0, 32)}`, 5, 900);
+        await throttle(
+          `reset:ip:${hashToken(input.ip.trim()).slice(0, 32)}`,
+          5,
+          900,
+        );
       }
       if (!EMAIL.test(email)) return;
       await throttle(`reset:acct:${hashToken(email).slice(0, 32)}`, 3, 900);
@@ -345,24 +388,44 @@ export function createAuthService(options: {
       await safeSend(user.email, template.subject, template.text);
     },
 
-    async completeReset(input: { token: string; password: string }): Promise<void> {
+    async completeReset(input: {
+      token: string;
+      password: string;
+    }): Promise<void> {
       const problem = passwordProblem(input.password);
       if (problem) throw new AuthError("WEAK_PASSWORD", problem);
       if (COMMON_PASSWORDS.has(input.password.trim().toLowerCase())) {
-        throw new AuthError("WEAK_PASSWORD", "That password is too common to be safe");
+        throw new AuthError(
+          "WEAK_PASSWORD",
+          "That password is too common to be safe",
+        );
       }
 
-      const stored = await findEmailToken(client, hashToken(input.token), "reset");
+      const stored = await findEmailToken(
+        client,
+        hashToken(input.token),
+        "reset",
+      );
       const current = now();
-      if (!stored) throw new AuthError("INVALID_TOKEN", "That link is not valid");
+      if (!stored)
+        throw new AuthError("INVALID_TOKEN", "That link is not valid");
       if (new Date(stored.expiresAt).getTime() <= current.getTime()) {
-        throw new AuthError("INVALID_TOKEN", "That link has expired. Request a new one.");
+        throw new AuthError(
+          "INVALID_TOKEN",
+          "That link has expired. Request a new one.",
+        );
       }
-      if (!(await consumeEmailToken(client, stored.id, current.toISOString()))) {
+      if (
+        !(await consumeEmailToken(client, stored.id, current.toISOString()))
+      ) {
         throw new AuthError("INVALID_TOKEN", "That link has already been used");
       }
 
-      await updatePasswordHash(client, stored.userId, await hashPassword(input.password));
+      await updatePasswordHash(
+        client,
+        stored.userId,
+        await hashPassword(input.password),
+      );
       // A reset is the moment to cut off anything already holding a session.
       await deleteSessionsForUser(client, stored.userId);
     },

@@ -8,4 +8,5 @@ export function revalidatePost(slug: string) {
   revalidatePath("/posts");
   revalidatePath(`/posts/${slug}`);
   revalidatePath("/rss.xml");
+  revalidatePath("/sitemap.xml");
 }

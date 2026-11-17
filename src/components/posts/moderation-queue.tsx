@@ -47,10 +47,16 @@ export function ModerationQueue({ items }: { items: QueueItem[] }) {
       const response = await fetch(`/api/moderation/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, note: notes[id] ?? "" }),
+        body: JSON.stringify({
+          action,
+          note: notes[id] ?? "",
+          expectedVersion: items.find((item) => item.id === id)?.version,
+        }),
       });
       if (!response.ok) {
-        const data = (await response.json().catch(() => ({}))) as { message?: string };
+        const data = (await response.json().catch(() => ({}))) as {
+          message?: string;
+        };
         setError(data.message ?? "The decision could not be recorded");
         return;
       }
@@ -76,7 +82,10 @@ export function ModerationQueue({ items }: { items: QueueItem[] }) {
   return (
     <div className="space-y-4">
       {error && (
-        <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm">
+        <p
+          role="alert"
+          className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm"
+        >
           {error}
         </p>
       )}
@@ -86,7 +95,9 @@ export function ModerationQueue({ items }: { items: QueueItem[] }) {
           <li key={item.id} className="rounded-xl border bg-card p-5">
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2 text-xs">
-                <Badge variant="secondary">{TRUST_LABEL[item.trustLevel] ?? "Author"}</Badge>
+                <Badge variant="secondary">
+                  {TRUST_LABEL[item.trustLevel] ?? "Author"}
+                </Badge>
                 <span className="text-muted-foreground">
                   {item.authorName} (@{item.authorHandle}) · submitted{" "}
                   {DATE.format(new Date(item.updatedAt))}
@@ -95,7 +106,9 @@ export function ModerationQueue({ items }: { items: QueueItem[] }) {
 
               <div>
                 <h2 className="text-xl font-medium">{item.title}</h2>
-                <p className="mt-1 text-sm text-muted-foreground">{item.summary}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {item.summary}
+                </p>
               </div>
 
               <details className="rounded-lg border bg-background/50 p-3">
@@ -115,7 +128,10 @@ export function ModerationQueue({ items }: { items: QueueItem[] }) {
                   rows={2}
                   value={notes[item.id] ?? ""}
                   onChange={(event) =>
-                    setNotes((current) => ({ ...current, [item.id]: event.target.value }))
+                    setNotes((current) => ({
+                      ...current,
+                      [item.id]: event.target.value,
+                    }))
                   }
                   placeholder="Required when rejecting: what needs to change?"
                 />
@@ -134,7 +150,9 @@ export function ModerationQueue({ items }: { items: QueueItem[] }) {
                   type="button"
                   variant="outline"
                   className="h-11"
-                  disabled={busyId === item.id || !(notes[item.id] ?? "").trim()}
+                  disabled={
+                    busyId === item.id || !(notes[item.id] ?? "").trim()
+                  }
                   onClick={() => void act(item.id, "reject")}
                 >
                   Reject

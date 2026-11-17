@@ -37,18 +37,19 @@ export async function PUT(request: Request, context: Context) {
 
   const body = await readJson(request);
   if (!body) return jsonError(400, "Send a JSON object");
-  const expectedVersion = Number(body.expectedVersion);
+  const { expectedVersion: rawExpectedVersion, ...input } = body;
+  const expectedVersion = Number(rawExpectedVersion);
   if (!Number.isSafeInteger(expectedVersion) || expectedVersion < 1) {
     return jsonError(400, "expectedVersion is required");
   }
 
-  const parsed = postInputSchema.safeParse({ ...body, expectedVersion: undefined });
+  const parsed = postInputSchema.safeParse(input);
   if (!parsed.success) {
-    return jsonError(
-      400,
-      "Check the highlighted fields",
-      { issues: parsed.error.issues.map((issue) => `${issue.path.join(".") || "post"}: ${issue.message}`) },
-    );
+    return jsonError(400, "Check the highlighted fields", {
+      issues: parsed.error.issues.map(
+        (issue) => `${issue.path.join(".") || "post"}: ${issue.message}`,
+      ),
+    });
   }
 
   const { id } = await context.params;
@@ -60,7 +61,8 @@ export async function PUT(request: Request, context: Context) {
       expectedVersion,
     });
     // A save can publish or pull a post back into review.
-    if (post.status === "published" || post.status === "pending") revalidatePost(post.slug);
+    if (post.status === "published" || post.status === "pending")
+      revalidatePost(post.slug);
     return jsonOk({ post });
   } catch (error) {
     return errorResponse(error);

@@ -1,6 +1,11 @@
 import { randomUUID } from "node:crypto";
 
-import type { SqlClient, SqlResult, SqlStatement, SqlValue } from "../content-store.ts";
+import type {
+  SqlClient,
+  SqlResult,
+  SqlStatement,
+  SqlValue,
+} from "../content-store.ts";
 import { renderMarkdown } from "../markdown/render.ts";
 import { decideSubmitStatus, type TrustLevel } from "./lifecycle.ts";
 import { postInputSchema, type PostInput, type PostStatus } from "./schema.ts";
@@ -52,7 +57,10 @@ export class PostError extends Error {
 
 export type ModerationAction = "approve" | "reject" | "unpublish";
 
-const statement = (sql: string, args: SqlValue[] = []): SqlStatement => ({ sql, args });
+const statement = (sql: string, args: SqlValue[] = []): SqlStatement => ({
+  sql,
+  args,
+});
 
 const COLUMNS = `p.id, p.slug, p.title, p.summary, p.body_md, p.body_html,
   p.cover_image_url, p.tags, p.author_id, p.status, p.published_at,
@@ -86,14 +94,20 @@ function tagsOf(value: unknown): string[] {
   }
 }
 
-function toPost(row: SqlResult["rows"][number], author: PostAuthor | null = null): PostRow {
+function toPost(
+  row: SqlResult["rows"][number],
+  author: PostAuthor | null = null,
+): PostRow {
   return {
     id: String(row.id),
     slug: String(row.slug),
     title: String(row.title),
     summary: String(row.summary),
     bodyMd: String(row.body_md),
-    bodyHtml: row.body_html === null || row.body_html === undefined ? null : String(row.body_html),
+    bodyHtml:
+      row.body_html === null || row.body_html === undefined
+        ? null
+        : String(row.body_html),
     coverImageUrl:
       row.cover_image_url === null || row.cover_image_url === undefined
         ? null
@@ -120,7 +134,8 @@ function authorOf(row: SqlResult["rows"][number]): PostAuthor | null {
     id: String(row.author_id),
     handle,
     displayName: String(row.author_display_name ?? handle),
-    avatarUrl: row.author_avatar_url == null ? null : String(row.author_avatar_url),
+    avatarUrl:
+      row.author_avatar_url == null ? null : String(row.author_avatar_url),
     trustLevel: Number(row.author_trust_level ?? 0),
   };
 }
@@ -132,13 +147,17 @@ function invalid(message: string): never {
 function validateInput(input: PostInput): PostInput {
   const parsed = postInputSchema.safeParse(input);
   if (!parsed.success) {
-    invalid(parsed.error.issues[0]?.message ?? "The post could not be validated");
+    invalid(
+      parsed.error.issues[0]?.message ?? "The post could not be validated",
+    );
   }
   return parsed.data;
 }
 
 function searchText(input: PostInput): string {
-  return [input.title, input.summary, input.tags.join(" "), input.bodyMd].join("\n");
+  return [input.title, input.summary, input.tags.join(" "), input.bodyMd].join(
+    "\n",
+  );
 }
 
 /**
@@ -149,7 +168,8 @@ async function allocateSlug(
   client: SqlClient,
   input: PostInput,
 ): Promise<string> {
-  const base = (input.slug ? slugify(input.slug) : slugify(input.title)) || "post";
+  const base =
+    (input.slug ? slugify(input.slug) : slugify(input.title)) || "post";
   const taken = await client.execute({
     sql: "SELECT slug FROM posts WHERE slug = ? OR slug LIKE ?",
     args: [base, `${base}-%`],
@@ -175,12 +195,12 @@ function historyStatements(
     statement(
       `INSERT INTO post_revisions (id, post_id, version, title, summary, body_md, editor_id, created_at)
        SELECT ?, id, version, title, summary, body_md, ?, ?
-       FROM posts WHERE id = ? AND version = ?`,
+       FROM posts WHERE id = ? AND version = ? AND changes() > 0`,
       [randomUUID(), actorId, createdAt, postId, version],
     ),
     statement(
       `INSERT INTO content_audit (collection, record_id, actor, action, version)
-       SELECT 'posts', id, ?, ?, version FROM posts WHERE id = ? AND version = ?`,
+       SELECT 'posts', id, ?, ?, version FROM posts WHERE id = ? AND version = ? AND changes() > 0`,
       [actorId, auditAction, postId, version],
     ),
   ];
@@ -236,7 +256,10 @@ type CurrentPost = {
   role: string;
 };
 
-async function loadCurrent(client: SqlClient, id: string): Promise<CurrentPost | null> {
+async function loadCurrent(
+  client: SqlClient,
+  id: string,
+): Promise<CurrentPost | null> {
   const result = await client.execute(
     statement(
       `SELECT p.id, p.author_id, p.status, p.version, p.published_at,
@@ -263,7 +286,11 @@ async function loadCurrent(client: SqlClient, id: string): Promise<CurrentPost |
  * A draft stays a draft; anything already visible re-enters the review path
  * decided by the author's trust level.
  */
-function statusAfterEdit(current: PostStatus, trustLevel: TrustLevel): PostStatus {
+function statusAfterEdit(
+  current: PostStatus,
+  trustLevel: TrustLevel,
+): PostStatus {
+  if (current === "unpublished") return "unpublished";
   if (current === "draft" || current === "rejected") return "draft";
   if (current === "pending") return "pending";
   return decideSubmitStatus(trustLevel);
@@ -275,7 +302,10 @@ async function write(client: SqlClient, statements: SqlStatement[]) {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (/UNIQUE constraint failed: posts\.slug/i.test(message)) {
-      throw new PostError("CONFLICT", "That slug was claimed while saving; try again");
+      throw new PostError(
+        "CONFLICT",
+        "That slug was claimed while saving; try again",
+      );
     }
     throw error;
   }
@@ -333,7 +363,10 @@ export async function updateDraft(
 ): Promise<PostRow> {
   if (!options.id?.trim()) invalid("A post id is required");
   if (!options.authorId?.trim()) invalid("An author is required");
-  if (!Number.isSafeInteger(options.expectedVersion) || options.expectedVersion < 1) {
+  if (
+    !Number.isSafeInteger(options.expectedVersion) ||
+    options.expectedVersion < 1
+  ) {
     invalid("Expected version must be a positive integer");
   }
   const input = validateInput(options.input);
@@ -343,7 +376,10 @@ export async function updateDraft(
     throw new PostError("FORBIDDEN", "Only the author can edit this post");
   }
   if (current.version !== options.expectedVersion) {
-    throw new PostError("CONFLICT", "This post changed elsewhere; reload before saving");
+    throw new PostError(
+      "CONFLICT",
+      "This post changed elsewhere; reload before saving",
+    );
   }
 
   const rendered = await renderMarkdown(input.bodyMd);
@@ -375,11 +411,21 @@ export async function updateDraft(
         options.expectedVersion,
       ],
     ),
-    ...historyStatements(options.id, options.expectedVersion + 1, options.authorId, now, "update"),
+    ...historyStatements(
+      options.id,
+      options.expectedVersion + 1,
+      options.authorId,
+      now,
+      "update",
+    ),
   ]);
 
   const row = results[0].rows[0];
-  if (!row) throw new PostError("CONFLICT", "This post changed elsewhere; reload before saving");
+  if (!row)
+    throw new PostError(
+      "CONFLICT",
+      "This post changed elsewhere; reload before saving",
+    );
   return toPost(row);
 }
 
@@ -399,10 +445,16 @@ export async function submitPost(
     throw new PostError("FORBIDDEN", "Only the author can submit this post");
   }
   if (current.version !== options.expectedVersion) {
-    throw new PostError("CONFLICT", "This post changed elsewhere; reload before submitting");
+    throw new PostError(
+      "CONFLICT",
+      "This post changed elsewhere; reload before submitting",
+    );
   }
   if (current.status === "published") {
-    throw new PostError("BAD_STATE", "This post is already published; edit it instead");
+    throw new PostError(
+      "BAD_STATE",
+      "This post is already published; edit it instead",
+    );
   }
 
   // Re-render from the stored source: the draft's HTML may predate a fix.
@@ -412,9 +464,12 @@ export async function submitPost(
   const bodyMd = String(stored.rows[0]?.body_md ?? "");
   const rendered = await renderMarkdown(bodyMd);
 
-  const status: PostStatus = options.publish
-    ? decideSubmitStatus(current.trustLevel)
-    : "draft";
+  const status: PostStatus =
+    current.status === "unpublished"
+      ? "pending"
+      : options.publish
+        ? decideSubmitStatus(current.trustLevel)
+        : "draft";
   const now = nowIso();
   const publishedAt =
     status === "published" ? (current.publishedAt ?? now) : current.publishedAt;
@@ -445,11 +500,18 @@ export async function submitPost(
   ]);
 
   const row = results[0].rows[0];
-  if (!row) throw new PostError("CONFLICT", "This post changed elsewhere; reload before submitting");
+  if (!row)
+    throw new PostError(
+      "CONFLICT",
+      "This post changed elsewhere; reload before submitting",
+    );
   return toPost(row);
 }
 
-const TRANSITIONS: Record<ModerationAction, { from: PostStatus; to: PostStatus }> = {
+const TRANSITIONS: Record<
+  ModerationAction,
+  { from: PostStatus; to: PostStatus }
+> = {
   approve: { from: "pending", to: "published" },
   reject: { from: "pending", to: "rejected" },
   unpublish: { from: "published", to: "unpublished" },
@@ -460,22 +522,38 @@ export async function moderatePost(
   options: {
     id: string;
     moderatorId: string;
+    expectedVersion: number;
     action: ModerationAction;
     note?: string | null;
   },
 ): Promise<PostRow> {
   if (!options.id?.trim()) invalid("A post id is required");
   if (!options.moderatorId?.trim()) invalid("A moderator is required");
+  if (
+    !Number.isSafeInteger(options.expectedVersion) ||
+    options.expectedVersion < 1
+  ) {
+    invalid("Expected version must be a positive integer");
+  }
   const transition = TRANSITIONS[options.action];
   if (!transition) invalid("Unknown moderation action");
 
   const note = options.note?.trim() ? options.note.trim().slice(0, 2000) : null;
   if (options.action === "reject" && !note) {
-    throw new PostError("NOTE_REQUIRED", "Explain what needs to change before rejecting");
+    throw new PostError(
+      "NOTE_REQUIRED",
+      "Explain what needs to change before rejecting",
+    );
   }
 
   const current = await loadCurrent(client, options.id);
   if (!current) throw new PostError("NOT_FOUND", "Post not found");
+  if (current.version !== options.expectedVersion) {
+    throw new PostError(
+      "CONFLICT",
+      "This post changed elsewhere; reload the queue",
+    );
+  }
   if (current.status !== transition.from) {
     throw new PostError(
       "BAD_STATE",
@@ -485,7 +563,9 @@ export async function moderatePost(
 
   const now = nowIso();
   const publishedAt =
-    transition.to === "published" ? (current.publishedAt ?? now) : current.publishedAt;
+    transition.to === "published"
+      ? (current.publishedAt ?? now)
+      : current.publishedAt;
   const nextVersion = current.version + 1;
 
   const results = await write(client, [
@@ -509,11 +589,21 @@ export async function moderatePost(
       options.action === "approve" ? 1 : 0,
       options.action === "reject" ? 1 : 0,
     ),
-    ...historyStatements(options.id, nextVersion, options.moderatorId, now, options.action),
+    ...historyStatements(
+      options.id,
+      nextVersion,
+      options.moderatorId,
+      now,
+      options.action,
+    ),
   ]);
 
   const row = results[0].rows[0];
-  if (!row) throw new PostError("CONFLICT", "This post changed elsewhere; reload the queue");
+  if (!row)
+    throw new PostError(
+      "CONFLICT",
+      "This post changed elsewhere; reload the queue",
+    );
   return toPost(row);
 }
 
@@ -560,7 +650,8 @@ export async function listPublished(
   if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
     invalid("Limit must be between 1 and 100");
   }
-  if (!Number.isSafeInteger(offset) || offset < 0) invalid("Offset must not be negative");
+  if (!Number.isSafeInteger(offset) || offset < 0)
+    invalid("Offset must not be negative");
 
   const tag = options.tag?.trim();
   const result = await client.execute(
@@ -606,7 +697,9 @@ export async function listPending(client: SqlClient): Promise<PostRow[]> {
 export async function listRevisions(
   client: SqlClient,
   postId: string,
-): Promise<Array<{ version: number; title: string; editorId: string; createdAt: string }>> {
+): Promise<
+  Array<{ version: number; title: string; editorId: string; createdAt: string }>
+> {
   if (!postId?.trim()) invalid("A post id is required");
   const result = await client.execute(
     statement(

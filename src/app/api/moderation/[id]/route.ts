@@ -15,7 +15,9 @@ type Context = { params: Promise<{ id: string }> };
 const ACTIONS = new Set<ModerationAction>(["approve", "reject", "unpublish"]);
 
 function siteOrigin(request: Request): string {
-  return process.env.NEXT_PUBLIC_SITE_URL?.trim() || new URL(request.url).origin;
+  return (
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() || new URL(request.url).origin
+  );
 }
 
 export async function POST(request: Request, context: Context) {
@@ -29,13 +31,19 @@ export async function POST(request: Request, context: Context) {
   const body = await readJson(request);
   if (!body) return jsonError(400, "Send a JSON object");
   const action = String(body.action ?? "") as ModerationAction;
-  if (!ACTIONS.has(action)) return jsonError(400, "Choose approve, reject or unpublish");
+  if (!ACTIONS.has(action))
+    return jsonError(400, "Choose approve, reject or unpublish");
+  const expectedVersion = Number(body.expectedVersion);
+  if (!Number.isSafeInteger(expectedVersion) || expectedVersion < 1) {
+    return jsonError(400, "expectedVersion is required");
+  }
 
   const { id } = await context.params;
   try {
     const post = await moderatePost(client, {
       id,
       moderatorId: guard.user.id,
+      expectedVersion,
       action,
       note: typeof body.note === "string" ? body.note : null,
     });
@@ -47,12 +55,21 @@ export async function POST(request: Request, context: Context) {
       const template = moderationMail({
         displayName: author.displayName,
         title: post.title,
-        outcome: post.status === "published" ? "published" : post.status === "unpublished" ? "unpublished" : "rejected",
+        outcome:
+          post.status === "published"
+            ? "published"
+            : post.status === "unpublished"
+              ? "unpublished"
+              : "rejected",
         note: post.moderationNote,
         url: `${siteOrigin(request)}/posts/${post.slug}`,
       });
       mailer
-        .send({ to: author.email, subject: template.subject, text: template.text })
+        .send({
+          to: author.email,
+          subject: template.subject,
+          text: template.text,
+        })
         .catch((error: unknown) =>
           console.error(
             "Moderation mail failed",

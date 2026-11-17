@@ -21,7 +21,10 @@ const ACTIONS = new Set([
   "reset-complete",
 ]);
 
-function stringField(body: Record<string, unknown> | null, key: string): string {
+function stringField(
+  body: Record<string, unknown> | null,
+  key: string,
+): string {
   const value = body?.[key];
   return typeof value === "string" ? value : "";
 }
@@ -76,6 +79,7 @@ export async function POST(
             email: stringField(body, "email"),
             password: stringField(body, "password"),
             displayName: stringField(body, "displayName"),
+            ip: clientIp(request),
           });
         } catch (error) {
           // An existing address must look exactly like a new one.
@@ -110,7 +114,9 @@ export async function POST(
       }
 
       case "verify": {
-        const { user, session } = await service.verifyEmail(stringField(body, "token"));
+        const { user, session } = await service.verifyEmail(
+          stringField(body, "token"),
+        );
         return jsonOk({ ok: true, user }, 200, {
           "Set-Cookie": serializeSessionCookie(session, { secure }),
         });

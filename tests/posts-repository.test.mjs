@@ -70,7 +70,8 @@ const INPUT = {
   title: "Nandi Hills before sunrise",
   summary:
     "Leaving Hebbal at five, what to carry, and where the road turns rough before the final climb.",
-  bodyMd: "## The start\n\nWe rolled out at five.\n\n:::callout{type=tip}\nCarry a light.\n:::\n",
+  bodyMd:
+    "## The start\n\nWe rolled out at five.\n\n:::callout{type=tip}\nCarry a light.\n:::\n",
   tags: ["rides", "nandi-hills"],
 };
 
@@ -97,9 +98,15 @@ test("createDraft stores a draft, rendered html and one history entry", async (t
   assert.equal(post.publishedAt, null);
   assert.match(String(post.bodyHtml), /<h2 id="user-content-the-start"/);
   assert.deepEqual(post.tags, ["rides", "nandi-hills"]);
-  assert.equal(await count(db, "SELECT COUNT(*) AS value FROM post_revisions"), 1);
   assert.equal(
-    await count(db, "SELECT COUNT(*) AS value FROM content_audit WHERE action = 'create'"),
+    await count(db, "SELECT COUNT(*) AS value FROM post_revisions"),
+    1,
+  );
+  assert.equal(
+    await count(
+      db,
+      "SELECT COUNT(*) AS value FROM content_audit WHERE action = 'create'",
+    ),
     1,
   );
 });
@@ -124,6 +131,100 @@ test("a stale version conflicts instead of overwriting", async (t) => {
   );
 });
 
+test("competing saves return one conflict and leave only the winner's history", async (t) => {
+  const { db, client } = await setup(t);
+  const post = await createDraft(client, { authorId: "author", input: INPUT });
+  // Both callers finish their reads before either transaction takes the lock.
+  // Serialize batches just as libSQL serializes write transactions.
+  const originalBatch = client.batch.bind(client);
+  let tail = Promise.resolve();
+  client.batch = (...args) => {
+    const result = tail.then(() => originalBatch(...args));
+    tail = result.catch(() => undefined);
+    return result;
+  };
+  const results = await Promise.allSettled(
+    ["First competing title", "Second competing title"].map((title) =>
+      updateDraft(client, {
+        id: post.id,
+        authorId: "author",
+        input: { ...INPUT, title },
+        expectedVersion: 1,
+      }),
+    ),
+  );
+  assert.equal(
+    results.filter((result) => result.status === "fulfilled").length,
+    1,
+  );
+  const loser = results.find((result) => result.status === "rejected");
+  assert.equal(loser.reason.code, "CONFLICT");
+  assert.equal((await listRevisions(client, post.id)).length, 2);
+  assert.equal(
+    await count(db, "SELECT COUNT(*) AS value FROM content_audit"),
+    2,
+  );
+});
+
+test("moderation refuses a version newer than the reviewed draft", async (t) => {
+  const { client } = await setup(t);
+  const draft = await createDraft(client, { authorId: "author", input: INPUT });
+  const pending = await submitPost(client, {
+    id: draft.id,
+    authorId: "author",
+    expectedVersion: 1,
+    publish: true,
+  });
+  await updateDraft(client, {
+    id: draft.id,
+    authorId: "author",
+    input: { ...INPUT, title: "Unreviewed replacement content" },
+    expectedVersion: pending.version,
+  });
+  await assert.rejects(
+    moderatePost(client, {
+      id: draft.id,
+      moderatorId: "mod",
+      action: "approve",
+      expectedVersion: pending.version,
+    }),
+    (error) => error instanceof PostError && error.code === "CONFLICT",
+  );
+  assert.equal((await listPublished(client)).length, 0);
+});
+
+test("trusted authors cannot restore a moderator-unpublished post without review", async (t) => {
+  const { client } = await setup(t, { trustLevel: 1, approvedCount: 3 });
+  const draft = await createDraft(client, { authorId: "author", input: INPUT });
+  const live = await submitPost(client, {
+    id: draft.id,
+    authorId: "author",
+    expectedVersion: 1,
+    publish: true,
+  });
+  const hidden = await moderatePost(client, {
+    id: draft.id,
+    moderatorId: "mod",
+    action: "unpublish",
+    expectedVersion: live.version,
+  });
+  const edited = await updateDraft(client, {
+    id: draft.id,
+    authorId: "author",
+    input: INPUT,
+    expectedVersion: hidden.version,
+  });
+  assert.equal(edited.status, "unpublished");
+  const resubmitted = await submitPost(client, {
+    id: draft.id,
+    authorId: "author",
+    expectedVersion: edited.version,
+    publish: true,
+  });
+  assert.equal(resubmitted.status, "pending");
+  assert.equal((await listPublished(client)).length, 0);
+});
+
 test("only the author may edit, and every transition records one revision", async (t) => {
   const { db, client } = await setup(t);
   const post = await createDraft(client, { authorId: "author", input: INPUT });
@@ -145,13 +246,22 @@ test("only the author may edit, and every transition records one revision", asyn
     expectedVersion: 1,
   });
   assert.equal(edited.version, 2);
-  assert.equal(await count(db, "SELECT COUNT(*) AS value FROM post_revisions"), 2);
-  assert.equal(await count(db, "SELECT COUNT(*) AS value FROM content_audit"), 2);
+  assert.equal(
+    await count(db, "SELECT COUNT(*) AS value FROM post_revisions"),
+    2,
+  );
+  assert.equal(
+    await count(db, "SELECT COUNT(*) AS value FROM content_audit"),
+    2,
+  );
 });
 
 test("trust level decides whether a submission is published or queued", async (t) => {
   const untrusted = await setup(t);
-  const draft = await createDraft(untrusted.client, { authorId: "author", input: INPUT });
+  const draft = await createDraft(untrusted.client, {
+    authorId: "author",
+    input: INPUT,
+  });
   const pending = await submitPost(untrusted.client, {
     id: draft.id,
     authorId: "author",
@@ -163,7 +273,10 @@ test("trust level decides whether a submission is published or queued", async (t
   assert.equal((await listPending(untrusted.client)).length, 1);
 
   const trusted = await setup(t, { trustLevel: 1, approvedCount: 3 });
-  const second = await createDraft(trusted.client, { authorId: "author", input: INPUT });
+  const second = await createDraft(trusted.client, {
+    authorId: "author",
+    input: INPUT,
+  });
   const live = await submitPost(trusted.client, {
     id: second.id,
     authorId: "author",
@@ -202,7 +315,10 @@ test("editing a published post returns it to review at trust zero", async (t) =>
 test("slugs never collide", async (t) => {
   const { client } = await setup(t);
   const first = await createDraft(client, { authorId: "author", input: INPUT });
-  const second = await createDraft(client, { authorId: "author", input: INPUT });
+  const second = await createDraft(client, {
+    authorId: "author",
+    input: INPUT,
+  });
   assert.equal(first.slug, "nandi-hills-before-sunrise");
   assert.equal(second.slug, "nandi-hills-before-sunrise-2");
   assert.equal((await getPostBySlug(client, first.slug))?.id, undefined);
@@ -224,19 +340,28 @@ test("approval publishes, promotes at three, and rejection requires a note", asy
   assert.equal(pending.status, "pending");
 
   await assert.rejects(
-    moderatePost(client, { id: pending.id, moderatorId: "mod", action: "reject" }),
+    moderatePost(client, {
+      id: pending.id,
+      moderatorId: "mod",
+      expectedVersion: pending.version,
+      action: "reject",
+    }),
     (error) => error instanceof PostError && error.code === "NOTE_REQUIRED",
   );
 
   const published = await moderatePost(client, {
     id: pending.id,
+    expectedVersion: pending.version,
     moderatorId: "mod",
     action: "approve",
   });
   assert.equal(published.status, "published");
   assert.ok(published.publishedAt);
   assert.equal(
-    await count(db, "SELECT approved_count AS value FROM users WHERE id = 'author'"),
+    await count(
+      db,
+      "SELECT approved_count AS value FROM users WHERE id = 'author'",
+    ),
     1,
   );
   // create, submit and approve each leave exactly one revision.
@@ -244,7 +369,12 @@ test("approval publishes, promotes at three, and rejection requires a note", asy
 
   // A second approve is refused: the post is no longer pending.
   await assert.rejects(
-    moderatePost(client, { id: published.id, moderatorId: "mod", action: "approve" }),
+    moderatePost(client, {
+      id: published.id,
+      moderatorId: "mod",
+      expectedVersion: published.version,
+      action: "approve",
+    }),
     (error) => error instanceof PostError && error.code === "BAD_STATE",
   );
 });
@@ -256,14 +386,27 @@ test("moderation counts drive trust exactly as the pure rules do", async (t) => 
     for (const rejected of [0, 1, 2, 5]) {
       for (const role of ["rider", "moderator"]) {
         const id = `u-${role}-${approved}-${rejected}`;
-        addUser(db, id, { handle: id, role, approvedCount: approved, rejectedCount: rejected });
-        db.prepare(`UPDATE users SET trust_level = ${TRUST_LEVEL_SQL} WHERE id = ?`).run(id);
+        addUser(db, id, {
+          handle: id,
+          role,
+          approvedCount: approved,
+          rejectedCount: rejected,
+        });
+        db.prepare(
+          `UPDATE users SET trust_level = ${TRUST_LEVEL_SQL} WHERE id = ?`,
+        ).run(id);
         const stored = Number(
-          db.prepare("SELECT trust_level AS value FROM users WHERE id = ?").get(id).value,
+          db
+            .prepare("SELECT trust_level AS value FROM users WHERE id = ?")
+            .get(id).value,
         );
         assert.equal(
           stored,
-          decideTrust({ approvedCount: approved, rejectedCount: rejected, isModerator: role === "moderator" }),
+          decideTrust({
+            approvedCount: approved,
+            rejectedCount: rejected,
+            isModerator: role === "moderator",
+          }),
           `${role} ${approved}/${rejected}`,
         );
       }
@@ -283,16 +426,23 @@ test("rejections demote a trusted author and unpublishing hides the post", async
 
   await moderatePost(client, {
     id: live.id,
+    expectedVersion: live.version,
     moderatorId: "mod",
     action: "unpublish",
     note: "Needs a photo credit.",
   });
   assert.equal((await listPublished(client)).length, 0);
   assert.equal((await listByAuthor(client, "author")).length, 1);
-  assert.equal((await listByAuthor(client, "author", { publishedOnly: true })).length, 0);
+  assert.equal(
+    (await listByAuthor(client, "author", { publishedOnly: true })).length,
+    0,
+  );
 
   db.prepare("UPDATE users SET trust_level = 0 WHERE id = 'author'").run();
-  const second = await createDraft(client, { authorId: "author", input: INPUT });
+  const second = await createDraft(client, {
+    authorId: "author",
+    input: INPUT,
+  });
   const pending = await submitPost(client, {
     id: second.id,
     authorId: "author",
@@ -301,18 +451,23 @@ test("rejections demote a trusted author and unpublishing hides the post", async
   });
   await moderatePost(client, {
     id: pending.id,
+    expectedVersion: pending.version,
     moderatorId: "mod",
     action: "reject",
     note: "This repeats an existing route guide.",
   });
   await moderatePost(client, {
     id: pending.id,
+    expectedVersion: pending.version,
     moderatorId: "mod",
     action: "reject",
     note: "unused",
   }).catch(() => undefined);
   assert.equal(
-    await count(db, "SELECT rejected_count AS value FROM users WHERE id = 'author'"),
+    await count(
+      db,
+      "SELECT rejected_count AS value FROM users WHERE id = 'author'",
+    ),
     1,
   );
 });
@@ -340,7 +495,12 @@ test("the public feed filters by tag and never leaks unpublished posts", async (
       expectedVersion: 1,
       publish: true,
     }).then((pending) =>
-      moderatePost(client, { id: pending.id, moderatorId: "mod", action: "approve" }),
+      moderatePost(client, {
+        id: pending.id,
+        moderatorId: "mod",
+        expectedVersion: pending.version,
+        action: "approve",
+      }),
     );
   }
 
@@ -353,7 +513,10 @@ test("the public feed filters by tag and never leaks unpublished posts", async (
 test("invalid input is refused before anything is written", async (t) => {
   const { db, client } = await setup(t);
   await assert.rejects(
-    createDraft(client, { authorId: "author", input: { ...INPUT, summary: "too short" } }),
+    createDraft(client, {
+      authorId: "author",
+      input: { ...INPUT, summary: "too short" },
+    }),
     (error) => error instanceof PostError && error.code === "INVALID_INPUT",
   );
   assert.equal(await count(db, "SELECT COUNT(*) AS value FROM posts"), 0);

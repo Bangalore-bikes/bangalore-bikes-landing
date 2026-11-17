@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 import { wikiGuides } from "@/data/wiki";
 import { getArticles, getRides } from "@/lib/content-source";
 import { getPostsClient, hasDatabaseConfig } from "@/lib/db";
-import { listPublished } from "@/lib/posts/repository";
+import { listPublished, type PostRow } from "@/lib/posts/repository";
 import {
   isPreviewDeployment,
   publicPages,
@@ -16,10 +16,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // The community database is optional; an unconfigured deployment simply has
   // no rider posts to list.
-  const posts = hasDatabaseConfig()
-    ? await listPublished(getPostsClient(), { limit: 100 }).catch(() => [])
-    : [];
-  const writers = [...new Set(posts.map((post) => post.author?.handle).filter(Boolean))];
+  const posts: PostRow[] = [];
+  if (hasDatabaseConfig()) {
+    try {
+      const client = getPostsClient();
+      for (let offset = 0; ; offset += 100) {
+        const page = await listPublished(client, { limit: 100, offset });
+        posts.push(...page);
+        if (page.length < 100) break;
+      }
+    } catch {
+      posts.length = 0;
+    }
+  }
+  const writers = [
+    ...new Set(posts.map((post) => post.author?.handle).filter(Boolean)),
+  ];
 
   const pages = Object.entries(publicPages)
     .filter(([path, page]) =>

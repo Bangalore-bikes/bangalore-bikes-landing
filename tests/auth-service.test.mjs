@@ -94,10 +94,37 @@ test("signup creates an unverified account and mails a single link", async (t) =
 test("weak passwords are refused before anything is stored", async (t) => {
   const { service, client } = await setup(t);
   await assert.rejects(
-    service.signUp({ email: "a@b.com", password: "short", displayName: "Asha" }),
+    service.signUp({
+      email: "a@b.com",
+      password: "short",
+      displayName: "Asha",
+    }),
     (error) => error instanceof AuthError && error.code === "WEAK_PASSWORD",
   );
   assert.equal(await findUserByEmail(client, "a@b.com"), null);
+});
+
+test("signup throttles an IP before creating more accounts or sending mail", async (t) => {
+  const { service, messages, client } = await setup(t);
+  for (let index = 0; index < 5; index++) {
+    await service.signUp({
+      email: `rider${index}@example.com`,
+      password: PASSWORD,
+      displayName: `Rider ${index}`,
+      ip: "192.0.2.1",
+    });
+  }
+  await assert.rejects(
+    service.signUp({
+      email: "blocked@example.com",
+      password: PASSWORD,
+      displayName: "Blocked Rider",
+      ip: "192.0.2.1",
+    }),
+    (error) => error instanceof AuthError && error.code === "THROTTLED",
+  );
+  assert.equal(await findUserByEmail(client, "blocked@example.com"), null);
+  assert.equal(messages.length, 5);
 });
 
 test("an unverified account cannot sign in, and verifying signs it in", async (t) => {
@@ -124,7 +151,10 @@ test("an unverified account cannot sign in, and verifying signs it in", async (t
     (error) => error instanceof AuthError && error.code === "INVALID_TOKEN",
   );
 
-  const login = await service.logIn({ email: "rider@example.com", password: PASSWORD });
+  const login = await service.logIn({
+    email: "rider@example.com",
+    password: PASSWORD,
+  });
   assert.equal(login.user.handle, "asha-rao");
   assert.equal((await service.currentUser(login.session)).id, login.user.id);
 });
@@ -140,8 +170,12 @@ test("five failed attempts throttle the account", async (t) => {
 
   for (let attempt = 1; attempt <= 5; attempt += 1) {
     await assert.rejects(
-      service.logIn({ email: "rider@example.com", password: "wrong password here" }),
-      (error) => error instanceof AuthError && error.code === "INVALID_CREDENTIALS",
+      service.logIn({
+        email: "rider@example.com",
+        password: "wrong password here",
+      }),
+      (error) =>
+        error instanceof AuthError && error.code === "INVALID_CREDENTIALS",
     );
   }
 
@@ -157,7 +191,10 @@ test("five failed attempts throttle the account", async (t) => {
     displayName: "Other Rider",
   });
   await service.verifyEmail(tokenFrom(messages[1]));
-  const login = await service.logIn({ email: "other@example.com", password: PASSWORD });
+  const login = await service.logIn({
+    email: "other@example.com",
+    password: PASSWORD,
+  });
   assert.ok(login.session);
 });
 
@@ -169,8 +206,14 @@ test("a reset link works once and signs out every existing session", async (t) =
     displayName: "Asha Rao",
   });
   await service.verifyEmail(tokenFrom(messages[0]));
-  const first = await service.logIn({ email: "rider@example.com", password: PASSWORD });
-  const second = await service.logIn({ email: "rider@example.com", password: PASSWORD });
+  const first = await service.logIn({
+    email: "rider@example.com",
+    password: PASSWORD,
+  });
+  const second = await service.logIn({
+    email: "rider@example.com",
+    password: PASSWORD,
+  });
 
   await service.requestReset({ email: "rider@example.com" });
   const reset = messages.at(-1);
@@ -183,7 +226,8 @@ test("a reset link works once and signs out every existing session", async (t) =
   assert.equal(await service.currentUser(second.session), null);
   await assert.rejects(
     service.logIn({ email: "rider@example.com", password: PASSWORD }),
-    (error) => error instanceof AuthError && error.code === "INVALID_CREDENTIALS",
+    (error) =>
+      error instanceof AuthError && error.code === "INVALID_CREDENTIALS",
   );
   const login = await service.logIn({
     email: "rider@example.com",
@@ -211,8 +255,14 @@ test("logout ends only the current session", async (t) => {
     displayName: "Asha Rao",
   });
   await service.verifyEmail(tokenFrom(messages[0]));
-  const phone = await service.logIn({ email: "rider@example.com", password: PASSWORD });
-  const laptop = await service.logIn({ email: "rider@example.com", password: PASSWORD });
+  const phone = await service.logIn({
+    email: "rider@example.com",
+    password: PASSWORD,
+  });
+  const laptop = await service.logIn({
+    email: "rider@example.com",
+    password: PASSWORD,
+  });
 
   await service.logOut(phone.session);
   assert.equal(await service.currentUser(phone.session), null);
@@ -220,7 +270,9 @@ test("logout ends only the current session", async (t) => {
 });
 
 test("ADMIN_EMAILS promotes an account when it confirms its address", async (t) => {
-  const { service, messages } = await setup(t, { adminEmails: ["mod@example.com"] });
+  const { service, messages } = await setup(t, {
+    adminEmails: ["mod@example.com"],
+  });
   await service.signUp({
     email: "mod@example.com",
     password: PASSWORD,
