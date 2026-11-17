@@ -53,6 +53,8 @@ For local browser smoke checks, build the app, run npm start -- -p 3102 in anoth
 
 ## Hosting
 
+See [community features](./docs/community-features.md) for invite QR generation, community-feed availability, shareable destinations and CSV exports. The [full-stack direction](./docs/full-stack-design.md) records the selected managed-database architecture and remaining configuration.
+
 Project is currently hosted at [bangalorebikes.com](https://bangalorebikes.com/) as a [Netlify](https://www.netlify.com/) project.
 
 [bangalorebikes.vercel.app](https://bangalorebikes.vercel.app/) is also available as the secondary/staging deployment. The primary domain remains the canonical address for search engines and sharing.

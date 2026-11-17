@@ -13,6 +13,7 @@ const routes = [
   "/",
   "/wiki",
   "/contact",
+  "/join",
   "/rides",
   "/blogs",
   "/destinations",
@@ -21,7 +22,16 @@ const routes = [
   "/maintenance/sos",
   ...guideRoutes,
 ];
-const indexed = ["/", "/wiki", "/contact", "/destinations", ...guideRoutes];
+const indexed = [
+  "/",
+  "/wiki",
+  "/contact",
+  "/join",
+  "/destinations",
+  "/maintenance",
+  "/maintenance/garages",
+  ...guideRoutes,
+];
 const htmlFor = (path) =>
   readFileSync(
     new URL(

@@ -1,9 +1,10 @@
 import Image from "next/image";
-import { LatestFromBlog } from "@/components/home/LatestFromBlog";
+import { CommunityPosts } from "@/components/home/CommunityPosts";
 import { UpcomingRides } from "@/components/home/UpcomingRides";
 import { LatestArticles } from "@/components/home/LatestArticles";
 import { WikiHighlights } from "@/components/home/WikiHighlights";
 import Link from "next/link";
+import { WhatsAppJoin } from "@/components/common/whatsapp-join";
 
 const Hero = () => {
   return (
@@ -43,10 +44,11 @@ export default function Home() {
   return (
     <main className="flex flex-col gap-8 w-full self-center px-2 lg:px-8">
       <Hero />
+      <CommunityPosts />
       <WikiHighlights />
       <UpcomingRides />
       <LatestArticles />
-      <LatestFromBlog />
+      <WhatsAppJoin />
     </main>
   );
 }

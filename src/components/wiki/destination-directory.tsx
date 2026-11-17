@@ -1,8 +1,15 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import type { Destination } from "@/lib/wiki";
 import { filterDestinations } from "@/lib/destinationSearch";
+import {
+  createDestinationCsv,
+  readDestinationFilters,
+  writeDestinationFilters,
+  type DestinationFilters,
+} from "@/lib/destinationSharing";
+import { siteOrigin } from "@/lib/siteMetadata";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -14,15 +21,101 @@ export function DestinationDirectory({
   columns: readonly string[];
 }) {
   const formId = useId();
-  const [query, setQuery] = useState("");
-  const [kind, setKind] = useState("All");
-  const [distance, setDistance] = useState("all");
+  const [filters, setFilters] = useState<DestinationFilters>({
+    query: "",
+    kind: "All",
+    distance: "all",
+  });
+  const { query, kind, distance } = filters;
+  const [feedback, setFeedback] = useState("");
+  const [manualLink, setManualLink] = useState("");
   const results = filterDestinations(entries, query, kind, distance);
-  const kinds = [...new Set(entries.map((entry) => entry.kind))].sort();
-  const reset = () => {
-    setQuery("");
-    setKind("All");
-    setDistance("all");
+  const kinds = useMemo(
+    () => [...new Set(entries.map((entry) => entry.kind))].sort(),
+    [entries],
+  );
+  useEffect(() => {
+    const restore = () => {
+      const next = readDestinationFilters(
+        new URLSearchParams(window.location.search),
+        kinds,
+      );
+      const selected = entries.find(
+        (entry) => window.location.hash === "#place-" + entry.id,
+      );
+      if (
+        selected &&
+        !filterDestinations(entries, next.query, next.kind, next.distance).some(
+          (entry) => entry.id === selected.id,
+        )
+      ) {
+        next.query = "";
+        next.kind = "All";
+        next.distance = "all";
+        const url = new URL(window.location.href);
+        url.search = writeDestinationFilters(url.searchParams, next).toString();
+        window.history.replaceState(null, "", url);
+      }
+      setFilters(next);
+      setFeedback("");
+      setManualLink("");
+      if (selected)
+        requestAnimationFrame(() => {
+          const target = document.getElementById("place-" + selected.id);
+          if (target instanceof HTMLDetailsElement) {
+            target.open = true;
+            target.scrollIntoView({ block: "start" });
+          }
+        });
+    };
+    restore();
+    window.addEventListener("popstate", restore);
+    window.addEventListener("hashchange", restore);
+    return () => {
+      window.removeEventListener("popstate", restore);
+      window.removeEventListener("hashchange", restore);
+    };
+  }, [entries, kinds]);
+
+  const changeFilters = (next: DestinationFilters) => {
+    setFilters(next);
+    setFeedback("");
+    setManualLink("");
+    const url = new URL(window.location.href);
+    url.search = writeDestinationFilters(url.searchParams, next).toString();
+    url.hash = "";
+    window.history.replaceState(null, "", url);
+  };
+  const reset = () =>
+    changeFilters({ query: "", kind: "All", distance: "all" });
+  const copyLink = async () => {
+    const url = window.location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      setFeedback("Link copied. It includes your current filters.");
+    } catch {
+      setManualLink(url);
+      setFeedback("Copy the address below to share this view.");
+    }
+  };
+  const download = () => {
+    const url = URL.createObjectURL(
+      new Blob([createDestinationCsv(results, columns, siteOrigin)], {
+        type: "text/csv;charset=utf-8",
+      }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "bangalore-bikes-historical-destinations.csv";
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setFeedback(
+      "CSV prepared for " +
+        results.length +
+        " " +
+        (results.length === 1 ? "destination" : "destinations") +
+        ". Historical source notes are included.",
+    );
   };
   const selectStyle =
     "mt-2 min-h-11 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-ring";
@@ -41,7 +134,10 @@ export function DestinationDirectory({
             type="search"
             placeholder="Try Nandi, waterfall or Mysore"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) =>
+              changeFilters({ ...filters, query: event.target.value })
+            }
+            maxLength={200}
             className="mt-2 min-h-11"
           />
         </div>
@@ -52,7 +148,9 @@ export function DestinationDirectory({
           <select
             id={formId + "-kind"}
             value={kind}
-            onChange={(event) => setKind(event.target.value)}
+            onChange={(event) =>
+              changeFilters({ ...filters, kind: event.target.value })
+            }
             className={selectStyle}
           >
             <option value="All">All types</option>
@@ -70,7 +168,9 @@ export function DestinationDirectory({
           <select
             id={formId + "-distance"}
             value={distance}
-            onChange={(event) => setDistance(event.target.value)}
+            onChange={(event) =>
+              changeFilters({ ...filters, distance: event.target.value })
+            }
             className={selectStyle}
           >
             <option value="all">Any distance</option>
@@ -95,6 +195,38 @@ export function DestinationDirectory({
           </Button>
         )}
       </div>
+      <div className="mb-5 flex flex-wrap gap-3">
+        <Button variant="outline" onClick={copyLink}>
+          Copy link to this view
+        </Button>
+        <Button
+          variant="outline"
+          onClick={download}
+          disabled={results.length === 0}
+        >
+          Download {results.length}{" "}
+          {results.length === 1 ? "record" : "records"} as CSV
+        </Button>
+      </div>
+      {feedback && (
+        <p role="status" className="mb-4 text-sm text-muted-foreground">
+          {feedback}
+        </p>
+      )}
+      {manualLink && (
+        <div className="mb-5">
+          <label htmlFor={formId + "-share"} className="text-sm font-medium">
+            Address to share
+          </label>
+          <Input
+            id={formId + "-share"}
+            className="mt-2"
+            value={manualLink}
+            readOnly
+            onFocus={(event) => event.target.select()}
+          />
+        </div>
+      )}
       <p className="mb-5 text-sm text-muted-foreground">
         Distances and every expanded field below are historical source values,
         not current travel advice. Open a place to read its original record.
@@ -140,6 +272,12 @@ export function DestinationDirectory({
                   </div>
                 ))}
               </dl>
+              <a
+                href={"#place-" + entry.id}
+                className="mt-6 mr-6 inline-flex min-h-11 items-center text-sm underline underline-offset-4"
+              >
+                Link to this record
+              </a>
               <a
                 href={
                   "https://www.google.com/maps/search/?api=1&query=" +
