@@ -1,0 +1,270 @@
+[
+  {
+    "slug": "community-rules",
+    "title": "Community rules & etiquette",
+    "summary": "What it means to be part of Bangalore Bikes: respect, inclusion, responsible riding and useful conversations.",
+    "attribution": "Adapted from the moderation team's published community notices, not a verbatim copy of the wiki rules page.",
+    "sections": [
+      {
+        "id": "everyone-belongs",
+        "title": "Every rider belongs",
+        "paragraphs": [
+          "Bangalore Bikes welcomes riders across motorcycle brands, engine sizes, experience levels and backgrounds. A commuter, scooter or superbike does not decide whether you belong."
+        ],
+        "items": [
+          "Respect people regardless of their identity, religion, caste, gender or choice of motorcycle.",
+          "Discrimination, harassment, slurs and gatekeeping have no place in the community."
+        ]
+      },
+      {
+        "id": "keep-it-constructive",
+        "title": "Keep conversations constructive",
+        "paragraphs": [
+          "Share routes, maintenance questions, ride experiences and practical information. Disagreement is welcome; personal attacks and public arguments are not."
+        ],
+        "items": [
+          "If a conflict becomes unsafe or targeted, contact the moderators rather than escalating it in a thread or group chat.",
+          "You remain responsible for your own words and actions. Community membership does not excuse unlawful behaviour."
+        ]
+      },
+      {
+        "id": "responsible-riding",
+        "title": "Responsible riding is part of the culture",
+        "paragraphs": [
+          "The moderation team does not support content promoting street racing, dangerous public-road stunts or traffic-law violations."
+        ],
+        "items": [
+          "Do not normalise behaviour that puts other road users at risk.",
+          "Use moderator contact for concerns about community conduct."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "label": "Community standards: moderation-team notice",
+        "url": "https://www.reddit.com/r/bangalorebikes/comments/1waqjsy/a_quick_reminder_on_community_standards_respect/"
+      },
+      {
+        "label": "A note from the moderation team",
+        "url": "https://www.reddit.com/r/bangalorebikes/comments/1md4nkz/"
+      }
+    ]
+  },
+  {
+    "slug": "ride-rules",
+    "title": "Before your first group ride",
+    "summary": "Gear, group conduct, personal responsibility and the checks to make before meeting the other riders.",
+    "attribution": "Summarised from published community ride guidance and moderator replies. Check the specific ride announcement for its current requirements.",
+    "sections": [
+      {
+        "id": "before-you-leave",
+        "title": "Before you leave",
+        "paragraphs": [
+          "Read the ride announcement and confirm the meeting point, departure time and organiser's requirements. Do not assume that an old ride post describes a future event."
+        ],
+        "items": [
+          "The moderators' published guidance asks for protective gear, with a helmet, shoes and gloves as a minimum.",
+          "Carry your necessary vehicle and riding documents.",
+          "Only join with a vehicle you trust and can take responsibility for.",
+          "Plan to pay your own expenses; community rides are not automatically sponsored."
+        ]
+      },
+      {
+        "id": "on-the-road",
+        "title": "Ride as a group",
+        "paragraphs": [
+          "Moderator guidance describes a lead rider, sweep riders and a tail rider to help keep the group together. Follow the briefing for the ride you join."
+        ],
+        "items": [
+          "Follow traffic rules. No intoxicated riding, public-road stunts, excessive speed or unnecessary overtaking.",
+          "Pillions must also follow road-safety requirements and not create a hazard.",
+          "All kinds of motorcycles are welcome; riding responsibly matters more than the machine."
+        ]
+      },
+      {
+        "id": "your-responsibility",
+        "title": "Your responsibility",
+        "paragraphs": [
+          "You are responsible for your actions, vehicle and belongings. Moderators and fellow riders are not a substitute for emergency services. See the emergency guide before setting off."
+        ],
+        "items": []
+      }
+    ],
+    "sources": [
+      {
+        "label": "Community ride announcement and published rules",
+        "url": "https://www.reddit.com/r/indianbikes/comments/1dqn0ic/"
+      },
+      {
+        "label": "Moderator explanation of group-ride gear and conduct",
+        "url": "https://www.reddit.com/r/bangalorebikes/comments/1ei1611/"
+      }
+    ]
+  },
+  {
+    "slug": "whatsapp",
+    "title": "WhatsApp & member privacy",
+    "summary": "Joining the group, keeping your phone number private, and respecting other members' inboxes.",
+    "attribution": "Adapted from the public wiki index, WhatsApp announcement and moderation-team inbox notice. It is not a complete copy of the blocked WhatsApp wiki page.",
+    "sections": [
+      {
+        "id": "joining-the-group",
+        "title": "Joining is your choice",
+        "paragraphs": [
+          "The subreddit wiki links to a WhatsApp group for community conversations and ride planning. Joining can expose your phone number to other participants; decide whether you are comfortable sharing it.",
+          "The invite may change or the group may be full. Reddit remains an option if you prefer to keep your number private."
+        ],
+        "items": []
+      },
+      {
+        "id": "respect-inboxes",
+        "title": "Ask before sending a direct message",
+        "paragraphs": [
+          "The moderation team asks members to keep useful questions public and seek permission before messaging someone privately."
+        ],
+        "items": [
+          "Do not send unsolicited promotions, repeated messages or harassing DMs.",
+          "If you receive unwanted messages, keep evidence and contact moderators through modmail.",
+          "Being in the same group is not permission to contact someone privately."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "label": "Wiki index and group invitation",
+        "url": "https://www.reddit.com/r/bangalorebikes/wiki/index/"
+      },
+      {
+        "label": "WhatsApp group: original community announcement",
+        "url": "https://www.reddit.com/r/bangalorebikes/comments/1e6hto7/"
+      },
+      {
+        "label": "Moderator notice on unsolicited messages",
+        "url": "https://www.reddit.com/r/bangalorebikes/comments/1we7dob/community_notice_respecting_member_inboxes_zero/"
+      }
+    ]
+  },
+  {
+    "slug": "emergency-contacts",
+    "title": "Emergency help on a ride",
+    "summary": "Call emergency services first. Know what information to share and where the community's role ends.",
+    "attribution": "112 is verified against the Ministry of Home Affairs ERSS information. Community coordination is summarised from the published ride emergency SOP; this is not a replacement for dispatcher instructions.",
+    "sections": [
+      {
+        "id": "call-emergency-services",
+        "title": "Call 112 for an emergency",
+        "paragraphs": [
+          "India's Emergency Response Support System uses 112 for emergency assistance. Call emergency services first, not the moderators. Follow the dispatcher's instructions."
+        ],
+        "items": [
+          "Share your exact location or a nearby landmark.",
+          "Explain what happened and how many people need help.",
+          "Give the dispatcher the details they ask for."
+        ]
+      },
+      {
+        "id": "coordinate-the-group",
+        "title": "Then inform the ride lead",
+        "paragraphs": [
+          "The community's published emergency SOP puts emergency services before moderator contact. Once that contact is made, inform the ride lead so the group can coordinate practical help."
+        ],
+        "items": [
+          "Share verified updates rather than speculation.",
+          "Do not post another person's accident images or private details without consent.",
+          "Bangalore Bikes does not operate an ambulance, emergency hotline or roadside-assistance service."
+        ]
+      },
+      {
+        "id": "roadside-assistance",
+        "title": "For a non-emergency breakdown",
+        "paragraphs": [
+          "Use your insurer's or motorcycle manufacturer's published roadside-assistance contact. This site does not list unverified towing numbers or promise that a provider is available."
+        ],
+        "items": []
+      }
+    ],
+    "sources": [
+      {
+        "label": "Ministry of Home Affairs: Emergency Response Support System",
+        "url": "https://www.mha.gov.in/emergency-response-support-system-erss"
+      },
+      {
+        "label": "Bangalore Bikes: published ride emergency SOP",
+        "url": "https://www.reddit.com/r/bangalorebikes/comments/1td5o8v/bangalore_bikes_ride_emergency_sop_v10/"
+      }
+    ]
+  },
+  {
+    "slug": "routes-and-destinations",
+    "title": "Routes, destinations & places to visit",
+    "summary": "Explore the wiki's Karnataka destination collection, its maps and the original worksheet—without leaving the website to browse the list.",
+    "attribution": "Destination records come from the wiki and its linked public worksheet. The worksheet's author states it has not been updated since 2010.",
+    "sections": [
+      {
+        "id": "explore-the-collection",
+        "title": "Find a place to explore",
+        "paragraphs": [
+          "The native destination directory includes hills, reservoirs, waterfalls, heritage sites, rivers and coastal places from the community wiki. Search by name, filter by the source's type, or narrow by its listed distance.",
+          "Open a destination's details to see the original source columns, including the source reference number. Two Hampi entries and the repeated source number 92 are preserved rather than silently dropped."
+        ],
+        "items": []
+      },
+      {
+        "id": "read-the-age-notice",
+        "title": "Use it as a starting point, not a current route plan",
+        "paragraphs": [
+          "The source worksheet has not been updated since 2010. Its distances, road descriptions, seasons, ratings, food and accommodation notes are historical and may be wrong today."
+        ],
+        "items": [
+          "Check current access, permissions, opening times and road conditions before you travel.",
+          "A distance in the source is not a live navigation estimate.",
+          "The wiki credits the original contributors; the website does not claim to have inspected or endorsed every destination."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "label": "Community wiki: routes and destinations",
+        "url": "https://www.reddit.com/r/bangalorebikes/wiki/index/routes_and_destinations/"
+      },
+      {
+        "label": "Original public worksheet and its 2010 age notice",
+        "url": "https://docs.google.com/spreadsheets/d/1dJyNKE22LkDEHM-WbbByP4EyoMx03UsvztuGk-cg95k/edit"
+      },
+      {
+        "label": "The Google Maps list linked by the wiki",
+        "url": "https://maps.app.goo.gl/ypXZdbHF8ctnFnJb6"
+      }
+    ]
+  },
+  {
+    "slug": "about",
+    "title": "Namma biking balaga",
+    "summary": "The people and idea behind r/BangaloreBikes: a shared love of riding and meeting fellow riders around Bengaluru.",
+    "attribution": "Adapted from the community's public wiki introduction.",
+    "sections": [
+      {
+        "id": "how-it-started",
+        "title": "It started with a ride",
+        "paragraphs": [
+          "The wiki describes two riders meeting through an Indian motorcycling forum, going for a ride and realising that others might enjoy joining them. More riders and moderators joined along the way."
+        ],
+        "items": []
+      },
+      {
+        "id": "what-brings-us-together",
+        "title": "Good rides, good company",
+        "paragraphs": [
+          "The community is open to people who want to ride, share stories and experiences, and make friends. This website brings its useful information into one readable place; Reddit remains the home for discussion and moderation."
+        ],
+        "items": []
+      }
+    ],
+    "sources": [
+      {
+        "label": "r/BangaloreBikes wiki: about the community",
+        "url": "https://www.reddit.com/r/bangalorebikes/wiki/index/"
+      }
+    ]
+  }
+]

@@ -2,12 +2,15 @@ import { readFileSync } from "node:fs";
 import { parseResourceCollection } from "../src/lib/resourceSchema.ts";
 import { parseRides } from "../src/lib/rideSchema.ts";
 import { parseArticles } from "../src/lib/articleSchema.ts";
+import { parseWikiGuides, destinationArchiveSchema } from "../src/lib/wiki.ts";
 
 let failed = false;
 for (const [file, parse] of [
   ["resources.json", parseResourceCollection],
   ["rides.json", parseRides],
   ["articles.json", parseArticles],
+  ["wiki-guides.json", parseWikiGuides],
+  ["wiki-destinations.json", (input) => destinationArchiveSchema.parse(input).rows],
 ]) {
   try {
     const records = parse(

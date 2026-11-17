@@ -12,7 +12,7 @@
     "storybook": "node scripts/storybook.mjs dev -p 6006 --disable-telemetry",
     "build-storybook": "node scripts/storybook.mjs build --disable-telemetry",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test tests/resource-search.test.mjs tests/resource-schema.test.mjs tests/rides.test.mjs tests/articles.test.mjs",
+    "test": "node --experimental-strip-types --test tests/resource-search.test.mjs tests/resource-schema.test.mjs tests/rides.test.mjs tests/articles.test.mjs tests/wiki.test.mjs",
     "test:resources": "node --experimental-strip-types --test tests/resource-search.test.mjs",
     "test:rides": "node --experimental-strip-types --test tests/rides.test.mjs",
     "test:content": "node --experimental-strip-types --test tests/resource-schema.test.mjs",

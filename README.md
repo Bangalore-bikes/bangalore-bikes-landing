@@ -20,6 +20,10 @@ Check out the [issues](https://github.com/Bangalore-bikes/bangalore-bikes-landin
 
 ## Editing community content
 
+The [native handbook](https://bangalorebikes.com/wiki) and destination directory now include on-site reading, full-text guide search, and 109 historical destination records. See [wiki migration](./docs/wiki-migration.md) for source coverage and the blocked pages still awaiting an export. The original worksheet has not been updated since 2010; it is not a current route or service guide.
+
+Edit `src/data/wiki-guides.json` for source-attributed handbook pages. `scripts/import-wiki-destinations.mjs` is a manual public-source import, not a build-time network dependency. The content validator checks both collections.
+
 Edit [resources.json](./src/data/resources.json) for attributed Reddit resources, [rides.json](./src/data/rides.json) for organizer-confirmed rides, and [articles.json](./src/data/articles.json) for original or permissioned articles. No component edits or API credentials are required.
 
 Resource drafts are omitted from the website; they are not private repository storage. Ride listings must be confirmed before publication. See [content maintenance](./docs/content-maintenance.md) and [ride publishing](./docs/rides.md).

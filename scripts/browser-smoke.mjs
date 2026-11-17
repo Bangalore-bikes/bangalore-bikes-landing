@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import {
+  existsSync,
+  mkdtempSync,
+  rmSync,
+  mkdirSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { once } from "node:events";
@@ -81,6 +87,18 @@ async function navigate(path) {
         `document.readyState === 'complete' && !!document.querySelector('main, h1')`,
       ),
     path,
+  );
+}
+
+async function screenshot(name) {
+  if (!process.argv.includes("--screenshots")) return;
+  const folder = resolve(".npm-tmp", "wiki-preview");
+  mkdirSync(folder, { recursive: true });
+  await evaluate("scrollTo(0, 0)");
+  const result = await command("Page.captureScreenshot", { format: "png" });
+  writeFileSync(
+    join(folder, name + ".png"),
+    Buffer.from(result.data, "base64"),
   );
 }
 
@@ -199,16 +217,19 @@ try {
     "mobile navigation closes",
   );
   await waitFor(
-    () => evaluate(`!!document.querySelector('input[type="search"]')`),
+    () =>
+      evaluate(
+        `!!document.querySelector('section[aria-labelledby="reddit-resources-title"] input[type="search"]')`,
+      ),
     "resource directory",
   );
   await evaluate(
-    `Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(document.querySelector('input[type="search"]'), 'workshop'); document.querySelector('input[type="search"]').dispatchEvent(new Event('input', {bubbles:true}))`,
+    `Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(document.querySelector('section[aria-labelledby="reddit-resources-title"] input[type="search"]'), 'workshop'); document.querySelector('section[aria-labelledby="reddit-resources-title"] input[type="search"]').dispatchEvent(new Event('input', {bubbles:true}))`,
   );
   await waitFor(
     () =>
       evaluate(
-        `document.querySelector('[role="status"]').textContent.trim() === '1 resource found'`,
+        `document.querySelector('section[aria-labelledby="reddit-resources-title"] [role="status"]').textContent.trim() === '1 resource found'`,
       ),
     "search filters content",
   );
@@ -218,7 +239,7 @@ try {
   await waitFor(
     () =>
       evaluate(
-        `document.querySelector('[role="status"]').textContent.trim() === '0 resources found'`,
+        `document.querySelector('section[aria-labelledby="reddit-resources-title"] [role="status"]').textContent.trim() === '0 resources found'`,
       ),
     "search and category intersect",
   );
@@ -233,7 +254,7 @@ try {
   await waitFor(
     () =>
       evaluate(
-        `document.querySelector('[role="status"]').textContent.trim() === '3 resources found'`,
+        `document.querySelector('section[aria-labelledby="reddit-resources-title"] [role="status"]').textContent.trim() === '3 resources found'`,
       ),
     "clear restores collection",
   );
@@ -252,6 +273,98 @@ try {
   );
   console.log(
     "PASS mobile menu, Reddit join, resource search/category/reset, correction link, mobile layout",
+  );
+
+  await screenshot("wiki-mobile");
+  await evaluate(
+    `Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(document.querySelector('section[aria-labelledby="handbook-topics-title"] input'), 'phone'); document.querySelector('section[aria-labelledby="handbook-topics-title"] input').dispatchEvent(new Event('input', {bubbles:true}))`,
+  );
+  await waitFor(
+    () =>
+      evaluate(
+        `document.querySelector('section[aria-labelledby="handbook-topics-title"] [role=status]').textContent.trim() === '1 guide found'`,
+      ),
+    "handbook full-text search",
+  );
+  await navigate("/wiki/ride-rules");
+  await waitFor(
+    () => evaluate(`!!document.querySelector('#before-you-leave')`),
+    "native ride guide",
+  );
+  assert.ok(
+    await evaluate(
+      `document.querySelector('article').textContent.includes('helmet, shoes and gloves')`,
+    ),
+    "Guide content is readable on-site",
+  );
+  assert.ok(
+    await evaluate(
+      `!!document.querySelector('nav[aria-label="In this guide"] a[href="#on-the-road"]')`,
+    ),
+    "Guide section navigation",
+  );
+  assert.ok(
+    await evaluate(`document.documentElement.scrollWidth <= innerWidth + 1`),
+    "Guide mobile overflow",
+  );
+  await screenshot("guide-mobile");
+  await navigate("/destinations");
+  await waitFor(
+    () =>
+      evaluate(
+        `document.querySelectorAll('section[aria-labelledby="destination-list-title"] details').length === 109`,
+      ),
+    "complete destination collection",
+  );
+  await screenshot("destinations-mobile");
+  assert.ok(
+    await evaluate(
+      `document.querySelector('aside[aria-label="Historical source notice"]').textContent.includes('2010')`,
+    ),
+    "Historical age notice",
+  );
+  await evaluate(
+    `Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(document.querySelector('input[type=search]'), 'Nandi'); document.querySelector('input[type=search]').dispatchEvent(new Event('input', {bubbles:true}))`,
+  );
+  await waitFor(
+    () =>
+      evaluate(
+        `document.querySelector('[role=status]').textContent.trim() === '1 of 109 destinations'`,
+      ),
+    "destination name search",
+  );
+  await evaluate(`document.querySelector('details summary').click()`);
+  assert.equal(
+    await evaluate(`document.querySelectorAll('details[open] dl dd').length`),
+    17,
+    "All original source columns are readable",
+  );
+  await evaluate(
+    `Array.from(document.querySelectorAll('button')).find(button => button.textContent === 'Reset destinations').click()`,
+  );
+  await waitFor(
+    () =>
+      evaluate(
+        `document.querySelector('[role=status]').textContent.trim() === '109 of 109 destinations'`,
+      ),
+    "destination reset",
+  );
+  await evaluate(
+    `const type = document.querySelectorAll('select')[0]; Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set.call(type, 'Water fall'); type.dispatchEvent(new Event('change', {bubbles:true})); const distance = document.querySelectorAll('select')[1]; Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set.call(distance, '150'); distance.dispatchEvent(new Event('change', {bubbles:true}))`,
+  );
+  await waitFor(
+    () =>
+      evaluate(
+        `document.querySelector('[role=status]').textContent.trim() === '2 of 109 destinations'`,
+      ),
+    "destination category and distance intersection",
+  );
+  assert.ok(
+    await evaluate(`document.documentElement.scrollWidth <= innerWidth + 1`),
+    "Destination mobile overflow",
+  );
+  console.log(
+    "PASS native handbook search and reading, section navigation, all 109 destinations, original columns, search/reset and intersecting filters",
   );
 
   await command("Emulation.setDeviceMetricsOverride", {
@@ -278,12 +391,21 @@ try {
     "/rides/missing-ride",
     "/rides/missing-ride/calendar",
     "/blogs/missing-story",
+    "/wiki/missing-guide",
   ]) {
     assert.equal((await fetch(new URL(path, base))).status, 404, path);
   }
   console.log(
     "PASS desktop layout, modmail contact, unknown ride and calendar 404s",
   );
+  if (process.argv.includes("--screenshots")) {
+    await navigate("/wiki");
+    await waitFor(
+      () => evaluate(`!!document.querySelector('#handbook-topics-title')`),
+      "desktop wiki preview",
+    );
+    await screenshot("wiki-desktop");
+  }
   if (process.argv.includes("--storybook")) {
     const gallery = await startStorybookServer();
     storybookServer = gallery.server;

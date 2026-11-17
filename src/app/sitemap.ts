@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { rides } from "@/data/rides";
 import { articles } from "@/data/articles";
+import { wikiGuides } from "@/data/wiki";
 import {
   isPreviewDeployment,
   publicPages,
@@ -20,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .map(([path]) => ({ url: siteOrigin + path }));
   return [
     ...pages,
+    ...wikiGuides.map((guide) => ({ url: siteOrigin + "/wiki/" + guide.slug })),
     ...articles.map((article) => ({
       url: siteOrigin + "/blogs/" + article.slug,
       lastModified: article.updatedAt,
