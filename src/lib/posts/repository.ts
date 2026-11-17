@@ -11,6 +11,7 @@ export type PostAuthor = {
   handle: string;
   displayName: string;
   avatarUrl: string | null;
+  trustLevel: number;
 };
 
 export type PostRow = {
@@ -120,6 +121,7 @@ function authorOf(row: SqlResult["rows"][number]): PostAuthor | null {
     handle,
     displayName: String(row.author_display_name ?? handle),
     avatarUrl: row.author_avatar_url == null ? null : String(row.author_avatar_url),
+    trustLevel: Number(row.author_trust_level ?? 0),
   };
 }
 
@@ -517,7 +519,7 @@ export async function moderatePost(
 
 const READ_SELECT = `SELECT ${COLUMNS}, u.handle AS author_handle,
     u.display_name AS author_display_name, u.avatar_url AS author_avatar_url,
-    p.author_id AS author_id
+    u.trust_level AS author_trust_level, p.author_id AS author_id
   FROM posts p JOIN users u ON u.id = p.author_id`;
 
 export async function getPostById(

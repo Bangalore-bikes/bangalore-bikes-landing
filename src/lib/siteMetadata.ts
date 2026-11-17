@@ -40,6 +40,12 @@ export const publicPages = {
       "Stories, ride reports, and conversations from the Bangalore Bikes motorcycle community.",
     index: false,
   },
+  "/posts": {
+    title: "Rider posts",
+    description:
+      "Ride reports, routes and workshop notes written by Bangalore Bikes riders, covering the roads, the seasons and the repairs that mattered.",
+    index: true,
+  },
   "/destinations": {
     title: "Riding destinations",
     description:
