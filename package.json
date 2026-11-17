@@ -19,6 +19,7 @@
     "test:content": "node --experimental-strip-types --test tests/resource-schema.test.mjs",
     "validate:content": "node --experimental-strip-types scripts/validate-content.mjs",
     "db:migrate": "node --experimental-strip-types scripts/migrate.mjs",
+    "db:migrate:posts": "node --experimental-strip-types scripts/migrate-posts.mjs",
     "test:admin": "node --experimental-strip-types --test tests/content-admin.test.mjs tests/admin-auth.test.mjs tests/content-store.test.mjs",
     "test:browser": "node scripts/browser-smoke.mjs",
     "test:seo": "node --test tests/seo-output.test.mjs tests/seo-policy.test.mjs"
