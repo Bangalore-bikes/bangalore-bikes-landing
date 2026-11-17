@@ -9,6 +9,7 @@ import {
 
 test("a password verifies only against its own hash", async () => {
   const hash = await hashPassword("correct horse battery staple");
+  assert.match(hash, /^\$argon2id\$/, "hashes must use argon2id, not argon2i or argon2d");
   assert.equal(await verifyPassword(hash, "correct horse battery staple"), true);
   assert.equal(await verifyPassword(hash, "wrong password entirely"), false);
 });

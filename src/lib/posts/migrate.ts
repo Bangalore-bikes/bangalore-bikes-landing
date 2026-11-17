@@ -133,6 +133,17 @@ const DDL = [
     uploaded_by TEXT NOT NULL REFERENCES users(id),
     created_at TEXT NOT NULL
   )`,
+
+  /**
+   * Shared with the managed content store, which creates the same table. It is
+   * repeated here so post writes never depend on `db:migrate` having run first.
+   * There is no collection CHECK, which is why posts can record against it.
+   */
+  `CREATE TABLE IF NOT EXISTS content_audit (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, collection TEXT NOT NULL,
+    record_id TEXT NOT NULL, actor TEXT NOT NULL, action TEXT NOT NULL,
+    version INTEGER NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')))`,
 ];
 
 /**

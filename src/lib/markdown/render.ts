@@ -204,7 +204,7 @@ function rehypeHardenLinks() {
           return;
         }
         if (/^https?:/i.test(href)) {
-          node.properties.rel = "noopener nofollow ugc";
+          node.properties.rel = ["noopener", "nofollow", "ugc"];
           node.properties.target = "_blank";
         }
         return;

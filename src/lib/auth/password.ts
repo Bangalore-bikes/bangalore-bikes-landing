@@ -1,8 +1,15 @@
-import { Algorithm, hash, verify } from "@node-rs/argon2";
+import { hash, verify } from "@node-rs/argon2";
+
+/**
+ * `Algorithm` is an ambient const enum, which `isolatedModules` cannot import
+ * at runtime, so the documented value is used directly. Argon2id = 2 in
+ * @node-rs/argon2 (Argon2d = 0, Argon2i = 1); asserted by the hash test.
+ */
+const ARGON2ID = 2;
 
 /** OWASP baseline for argon2id at the time of writing. */
 const OPTIONS = {
-  algorithm: Algorithm.Argon2id,
+  algorithm: ARGON2ID,
   memoryCost: 19456,
   timeCost: 2,
   parallelism: 1,
@@ -26,7 +33,7 @@ export async function verifyPassword(
   if (!storedHash || !plain) return false;
   try {
     return await verify(storedHash, plain.slice(0, MAX_PASSWORD_LENGTH), {
-      algorithm: Algorithm.Argon2id,
+      algorithm: ARGON2ID,
     });
   } catch {
     return false;
