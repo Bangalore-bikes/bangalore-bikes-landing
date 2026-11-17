@@ -1,18 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { articles } from "@/data/articles";
+
 import { ArticleContent } from "@/components/common/article-content";
+import { getArticles } from "@/lib/content-source";
 import { isPreviewDeployment, siteOrigin, siteName } from "@/lib/siteMetadata";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const articles = await getArticles();
   return articles.map((article) => ({ slug: article.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const articles = await getArticles();
   const article = articles.find((entry) => entry.slug === slug);
   if (!article) return { title: "Article not found", robots: { index: false } };
   const url = siteOrigin + "/blogs/" + article.slug;
@@ -44,6 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params;
+  const articles = await getArticles();
   const article = articles.find((entry) => entry.slug === slug);
   if (!article) notFound();
   return (

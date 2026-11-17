@@ -19,6 +19,8 @@ The owner selected keeping Vercel/Netlify with managed storage. Target a hosted 
 
 ## Proposed first CRUD scope
 
+Status: implemented. The repository contains the libSQL repository, GitHub OAuth admin with an allowlist, versioned CRUD API, `/admin` editor, migration script and database-aware public loaders. Activation still requires the owner to provision the database, OAuth apps and environment variables; see [content admin](./content-admin.md) and [activation](./activation-guide.md). Without a configured database the public site keeps serving the validated repository JSON.
+
 Start with moderator-managed articles, confirmed rides and curated resources, retaining the existing Zod content schemas and source attribution. Public readers only see published content; editors can create drafts, edit, publish and remove records. Actual organiser approval remains required for real ride publication.
 
 An editor UI requires real authentication and authorisation, not just hidden navigation. The proposed initial identity provider is GitHub OAuth with an explicitly configured moderator allowlist, server-only secrets and checks on every mutation. The owner still needs to select the administrator identities and provide the identity-provider configuration. Protect mutations from cross-origin requests, validate request bodies, keep an audit trail, and use conflict detection so simultaneous edits do not silently overwrite one another.

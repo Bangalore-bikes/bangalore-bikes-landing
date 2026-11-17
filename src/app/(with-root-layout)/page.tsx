@@ -6,6 +6,8 @@ import { WikiHighlights } from "@/components/home/WikiHighlights";
 import Link from "next/link";
 import { WhatsAppJoin } from "@/components/common/whatsapp-join";
 
+export const revalidate = 60;
+
 const Hero = () => {
   return (
     <div className="w-full flex justify-center mt-4 lg:mt-16">

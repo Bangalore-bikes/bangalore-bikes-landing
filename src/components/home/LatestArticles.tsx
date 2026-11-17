@@ -1,7 +1,8 @@
-import { articles } from "@/data/articles";
 import { ArticleList } from "@/components/common/article-list";
+import { getArticles } from "@/lib/content-source";
 
-export function LatestArticles() {
+export async function LatestArticles() {
+  const articles = await getArticles();
   if (articles.length === 0) return null;
   return (
     <section aria-labelledby="latest-articles-title" className="py-10">

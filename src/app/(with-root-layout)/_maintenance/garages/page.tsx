@@ -1,12 +1,15 @@
-import { CommunityPage } from "@/components/common/community-page";
 import Link from "next/link";
-import { communityResources } from "@/data/community-resources";
 
-const report = communityResources.find(
-  (resource) => resource.id === "workshop-experience",
-);
+import { CommunityPage } from "@/components/common/community-page";
+import { getCommunityResources } from "@/lib/content-source";
 
-export default function GaragesPage() {
+export const revalidate = 60;
+
+export default async function GaragesPage() {
+  const communityResources = await getCommunityResources();
+  const report = communityResources.find(
+    (resource) => resource.id === "workshop-experience",
+  );
   return (
     <CommunityPage
       title="Workshop experiences"
