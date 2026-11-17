@@ -45,7 +45,7 @@ export function AuthForm({
     setPending(true);
     setStatus({ kind: "idle", message: "" });
     try {
-      const response = await fetch(`/api/auth/${ACTIONS[mode]}`, {
+      const response = await fetch(`/api/account/${ACTIONS[mode]}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

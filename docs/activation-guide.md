@@ -144,6 +144,58 @@ For an additional off-platform snapshot, use `turso db export <database-name> --
 
 Do not assume this is zero-cost. Review database/storage/read/write/recovery limits and hosting usage, subscription terms and overages for the actual accounts: [Turso pricing](https://turso.tech/pricing), [Turso usage and billing](https://docs.turso.tech/help/usage-and-billing), [Vercel pricing](https://vercel.com/pricing), [Netlify pricing](https://www.netlify.com/pricing/).
 
+## 10. Community publishing: rider accounts and posts
+
+This is a separate surface from the GitHub admin panel. It uses the same libSQL
+database, and is inert until the steps below are done.
+
+1. **Create a Resend account** and verify the sending domain (for example
+   `bangalorebikes.com`) under **Domains**. Add the DNS records Resend shows, wait
+   for verification, then create an API key under **API Keys**. The free tier
+   covers 3,000 messages a month and 100 a day, far above expected volume.
+2. **Save the new server-side variables** in the same environment as the existing
+   ones:
+
+   | Variable | Value |
+   | --- | --- |
+   | `RESEND_API_KEY` | the Resend API key |
+   | `MAIL_FROM` | a verified sender, e.g. `Bangalore Bikes <hello@bangalorebikes.com>` |
+   | `ADMIN_EMAILS` | real moderator account emails, comma-separated |
+   | `NEXT_PUBLIC_SITE_URL` | the exact origin, so mail links point at the right host |
+
+   Leave `RESEND_API_KEY` unset in preview environments if you do not want preview
+   sign-ups to send mail; the transport then logs instead of sending.
+
+3. **Create the community tables** against the intended database, with that
+   environment's credentials supplied privately:
+
+   ```sh
+   npm run db:migrate:posts
+   ```
+
+   The script prints the target host, the tables it found and whether `posts_fts`
+   was created. It only issues `CREATE … IF NOT EXISTS`; re-running is a no-op. It
+   never alters or drops existing content tables.
+
+4. **Redeploy** so the runtime sees the new variables and the migrated schema.
+
+5. **Verify** on staging first:
+
+   - Sign up at `/signup` with an address listed in `ADMIN_EMAILS`, open the
+     confirmation mail, and confirm the link signs you in.
+   - Open the same link twice; the second attempt must be refused.
+   - Write a post at `/write`, submit it, and open `/moderation`.
+   - Approve it, then check `/posts`, `/posts/<slug>`, `/writers/<handle>`,
+     `/rss.xml` and `sitemap.xml` in a signed-out browser.
+   - Create a second account not in `ADMIN_EMAILS`, submit a post, and confirm it
+     waits in the queue and `/moderation` refuses that account.
+   - Request a password reset, use the link once, and confirm existing sessions are
+     signed out.
+
+6. **If mail does not arrive**, check the Resend logs for the domain, then confirm
+   `MAIL_FROM` uses the verified domain and not a `gmail.com` or other public
+   mailbox. Runtime logs record only the recipient's domain, never the address.
+
 ## End-user activation checklist
 
 - [ ] Code-ready implementation and `db:migrate` command are present in the deployed revision.
@@ -151,6 +203,7 @@ Do not assume this is zero-cost. Review database/storage/read/write/recovery lim
 - [ ] All seven server variables are saved with exact origins/callbacks; placeholder admins are replaced with real moderator logins.
 - [ ] Correct target databases are initialized; active hosts have been freshly deployed/redeployed.
 - [ ] `/admin` login works for moderators; unauthorized access is denied; CRUD, public visibility and persistence checks pass.
+- [ ] Community publishing: `RESEND_API_KEY`, `MAIL_FROM`, `ADMIN_EMAILS` and `NEXT_PUBLIC_SITE_URL` are saved; `npm run db:migrate:posts` ran against the intended database; confirmation mail arrives; a moderator can approve a post and see it public; a rider account is refused at `/moderation`.
 - [ ] Backup freshness/restore and subscription limits are checked. Only then label the feature **activated/deployed**.
 
 ## Direct setup links
