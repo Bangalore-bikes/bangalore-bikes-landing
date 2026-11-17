@@ -3,6 +3,12 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const origin = "https://bangalorebikes.com";
+const guideRoutes = JSON.parse(
+  readFileSync(
+    new URL("../src/data/wiki-guides.json", import.meta.url),
+    "utf8",
+  ),
+).map((guide) => "/wiki/" + guide.slug);
 const routes = [
   "/",
   "/wiki",
@@ -13,8 +19,9 @@ const routes = [
   "/maintenance",
   "/maintenance/garages",
   "/maintenance/sos",
+  ...guideRoutes,
 ];
-const indexed = ["/", "/wiki", "/contact"];
+const indexed = ["/", "/wiki", "/contact", "/destinations", ...guideRoutes];
 const htmlFor = (path) =>
   readFileSync(
     new URL(

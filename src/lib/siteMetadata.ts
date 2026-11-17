@@ -11,9 +11,9 @@ export const publicPages = {
     index: true,
   },
   "/wiki": {
-    title: "Community resources",
+    title: "Community handbook",
     description:
-      "Explore source-linked r/BangaloreBikes community notices and rider experiences. Search the collection by topic or category.",
+      "Read Bangalore Bikes guides on group rides, community rules, privacy and emergency help. Explore the native destination collection from the community wiki.",
     index: true,
   },
   "/contact": {
@@ -37,8 +37,8 @@ export const publicPages = {
   "/destinations": {
     title: "Riding destinations",
     description:
-      "Find destination discussions on r/BangaloreBikes while reviewed Bengaluru route guides are being prepared.",
-    index: false,
+      "Browse the community wiki's historical destination collection. Search places by name, type and listed distance, and read the original source records on the website.",
+    index: true,
   },
   "/maintenance": {
     title: "Motorcycle maintenance",

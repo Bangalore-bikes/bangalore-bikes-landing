@@ -16,6 +16,12 @@ export const Footer = () => (
       <Link href="/contact" className="underline underline-offset-4">
         Contact moderators
       </Link>
+      <Link href="/wiki" className="underline underline-offset-4">
+        Community handbook
+      </Link>
+      <Link href="/destinations" className="underline underline-offset-4">
+        Destinations
+      </Link>
     </nav>
     <p className="text-center text-xs text-muted-foreground">
       A community home for motorcycle riders in Bengaluru. All brands welcome.

@@ -2,6 +2,8 @@ import Image from "next/image";
 import { LatestFromBlog } from "@/components/home/LatestFromBlog";
 import { UpcomingRides } from "@/components/home/UpcomingRides";
 import { LatestArticles } from "@/components/home/LatestArticles";
+import { WikiHighlights } from "@/components/home/WikiHighlights";
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -25,6 +27,12 @@ const Hero = () => {
             Your hub for motorcycle enthusiasts in namma Bengaluru. Explore
             rides, learn about maintenance, and connect with fellow riders.
           </p>
+          <Link
+            href="/wiki"
+            className="mt-7 inline-flex min-h-12 items-center rounded-md bg-dixie px-6 py-3 font-semibold text-black hover:underline hover:underline-offset-4"
+          >
+            Explore the community handbook
+          </Link>
         </div>
       </div>
     </div>
@@ -35,6 +43,7 @@ export default function Home() {
   return (
     <main className="flex flex-col gap-8 w-full self-center px-2 lg:px-8">
       <Hero />
+      <WikiHighlights />
       <UpcomingRides />
       <LatestArticles />
       <LatestFromBlog />
