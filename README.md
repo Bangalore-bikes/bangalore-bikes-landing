@@ -28,6 +28,8 @@ Edit [resources.json](./src/data/resources.json) for attributed Reddit resources
 
 Resource drafts are omitted from the website; they are not private repository storage. Ride listings must be confirmed before publication. See [content maintenance](./docs/content-maintenance.md) and [ride publishing](./docs/rides.md).
 
+Moderators can also manage the same collections in the browser at `/admin` once the managed database and GitHub sign-in are configured. See [managed content admin](./docs/content-admin.md) and the [activation guide](./docs/activation-guide.md). Repository JSON stays the fallback when no database is configured.
+
 See [article publishing](./docs/articles.md) for structured content, attribution, and publication requirements.
 
 With Node 22.18+:

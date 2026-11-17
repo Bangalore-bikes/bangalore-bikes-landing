@@ -1,8 +1,9 @@
-import { CommunityPage } from "@/components/common/community-page";
-import { articles } from "@/data/articles";
 import { ArticleList } from "@/components/common/article-list";
+import { CommunityPage } from "@/components/common/community-page";
+import { getArticles } from "@/lib/content-source";
 
-export default function BlogsPage() {
+export default async function BlogsPage() {
+  const articles = await getArticles();
   return (
     <CommunityPage
       title="Community stories"

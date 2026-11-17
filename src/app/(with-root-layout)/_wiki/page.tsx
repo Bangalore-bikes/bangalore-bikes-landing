@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { ArrowRight, MapPinned } from "lucide-react";
+
+import { ResourceDirectory } from "@/components/common/resource-directory";
 import { WikiDirectory } from "@/components/wiki/wiki-directory";
 import { destinationArchive, wikiGuides } from "@/data/wiki";
-import { ResourceDirectory } from "@/components/common/resource-directory";
-import { communityResources } from "@/data/community-resources";
+import { getCommunityResources } from "@/lib/content-source";
 
-export default function WikiPage() {
+export const revalidate = 60;
+
+export default async function WikiPage() {
+  const communityResources = await getCommunityResources();
   return (
     <main className="mx-auto w-full max-w-6xl space-y-14 px-2 py-10 sm:space-y-20 sm:px-0 sm:py-16">
       <header className="grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-end">

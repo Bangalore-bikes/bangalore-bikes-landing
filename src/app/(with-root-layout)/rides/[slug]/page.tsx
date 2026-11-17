@@ -1,20 +1,25 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { rides } from "@/data/rides";
+
+import { RideAvailability } from "@/components/rides/ride-directory";
+import { Button } from "@/components/ui/button";
+import { getRides } from "@/lib/content-source";
 import { formatRideDate } from "@/lib/rides";
 import { isPreviewDeployment, siteOrigin } from "@/lib/siteMetadata";
-import { Button } from "@/components/ui/button";
-import { RideAvailability } from "@/components/rides/ride-directory";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const rides = await getRides();
   return rides.map((ride) => ({ slug: ride.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const rides = await getRides();
   const ride = rides.find((entry) => entry.slug === slug);
   if (!ride) return { title: "Ride not found", robots: { index: false } };
   return {
@@ -36,6 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function RidePage({ params }: Props) {
   const { slug } = await params;
+  const rides = await getRides();
   const ride = rides.find((entry) => entry.slug === slug);
   if (!ride) notFound();
   return (

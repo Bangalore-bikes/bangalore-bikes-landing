@@ -2,6 +2,8 @@
 
 Edit the link collection in [resources.json](../src/data/resources.json). The typed loader in [community-resources.ts](../src/data/community-resources.ts) validates it and passes only published entries to the homepage and directory.
 
+Once the managed database is configured, moderators can edit articles, rides, and resources at `/admin` instead of committing JSON. The schemas are identical, every write is versioned and audited, and the public pages revalidate. Repository JSON is the seed source and the fallback when no database is configured. See [managed content admin](./content-admin.md).
+
 Each entry needs an ID, title, category, summary, original source URL, source label, sourceCheckedOn date (YYYY-MM-DD), and status (draft or published). Allowed categories are Community, Maintenance, Destinations, Beginner, and Transport. Source labels distinguish community notices from member discussions; neither is an endorsement.
 
 Drafts are excluded from the rendered list and from props sent to the browser. They are not private: source files live in a Git repository, and drafts must not contain confidential details. Draft records must still satisfy the schema. Duplicate IDs or multiple URLs pointing to the same Reddit post fail validation.
