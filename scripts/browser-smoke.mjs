@@ -6,6 +6,7 @@ import {
   rmSync,
   mkdirSync,
   writeFileSync,
+  readFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -46,6 +47,7 @@ let socket;
 let storybookServer;
 let nextId = 0;
 const pending = new Map();
+let feedFixtureMode = "live";
 const timeoutMs = 15000;
 
 async function waitFor(check, label) {
@@ -135,6 +137,38 @@ try {
   await once(socket, "open");
   socket.addEventListener("message", ({ data }) => {
     const message = JSON.parse(data);
+    if (message.method === "Fetch.requestPaused") {
+      const sort = new URL(message.params.request.url).searchParams.get("sort");
+      const fixture = {
+        mode: "live",
+        sort,
+        posts: [
+          {
+            id: "fixture",
+            title:
+              "[TEST FIXTURE] " +
+              (sort === "new" ? "Newest" : "Trending") +
+              " community post",
+            url: "https://www.reddit.com/r/bangalorebikes/comments/abc123/test/",
+            author: "test-rider",
+            publishedAt: "2026-11-17T07:00:00.000Z",
+          },
+        ],
+      };
+      command("Fetch.fulfillRequest", {
+        requestId: message.params.requestId,
+        responseCode: feedFixtureMode === "live" ? 200 : 503,
+        responseHeaders: [{ name: "Content-Type", value: "application/json" }],
+        body: Buffer.from(
+          JSON.stringify(
+            feedFixtureMode === "live"
+              ? fixture
+              : { error: "Unavailable test fixture" },
+          ),
+        ).toString("base64"),
+      }).catch(() => {});
+      return;
+    }
     const request = pending.get(message.id);
     if (!request) return;
     pending.delete(message.id);
@@ -143,6 +177,19 @@ try {
     else request.done(message.result);
   });
   await command("Page.enable");
+  await command("Network.enable");
+  await command("Network.setBlockedURLs", { urls: ["*://preview.redd.it/*"] });
+  await command("Fetch.enable", {
+    patterns: [
+      { urlPattern: "*/api/community-posts*", requestStage: "Request" },
+    ],
+  });
+  const downloadFolder = join(profile, "downloads");
+  mkdirSync(downloadFolder, { recursive: true });
+  await command("Browser.setDownloadBehavior", {
+    behavior: "allow",
+    downloadPath: downloadFolder,
+  });
   await command("Emulation.setDeviceMetricsOverride", {
     width: 390,
     height: 844,
@@ -188,6 +235,32 @@ try {
     1,
     "Homepage main landmark",
   );
+  await waitFor(
+    () =>
+      evaluate(
+        `document.querySelector('section[aria-labelledby="community-posts-title"]').textContent.includes('[TEST FIXTURE] Trending community post')`,
+      ),
+    "live community feed rendering",
+  );
+  feedFixtureMode = "unavailable";
+  await evaluate(
+    `Array.from(document.querySelectorAll('[aria-label="Community post order"] button')).find(button => button.textContent === 'Newest').click()`,
+  );
+  await waitFor(
+    () =>
+      evaluate(
+        `document.querySelector('section[aria-labelledby="community-posts-title"] [role=status]').textContent.includes('selected community highlights')`,
+      ),
+    "honest feed failure fallback",
+  );
+  assert.ok(
+    await evaluate(
+      `document.querySelector('section[aria-labelledby="community-posts-title"]').textContent.includes('Service update (with location)')`,
+    ),
+  );
+  console.log(
+    "PASS community feed success and clearly labelled unavailable-feed fallback",
+  );
   console.log("PASS keyboard skip link and homepage main landmark");
   assert.ok(
     await evaluate(`document.documentElement.scrollWidth <= innerWidth + 1`),
@@ -202,7 +275,7 @@ try {
   );
   assert.ok(
     await evaluate(
-      `Array.from(document.querySelectorAll('[role="dialog"] a')).some(a => a.textContent.includes('Join on Reddit') && a.href === 'https://www.reddit.com/r/bangalorebikes/')`,
+      `Array.from(document.querySelectorAll('[role="dialog"] a')).some(a => a.textContent.includes('Join the community') && new URL(a.href).pathname === '/join')`,
     ),
     "Mobile join destination",
   );
@@ -339,6 +412,37 @@ try {
     17,
     "All original source columns are readable",
   );
+  assert.equal(
+    new URL(await evaluate("location.href")).searchParams.get("q"),
+    "Nandi",
+    "Filters update the shareable URL",
+  );
+  await evaluate(
+    `Array.from(document.querySelectorAll('button')).find(button => button.textContent.includes('Download 1 record as CSV')).click()`,
+  );
+  const csvPath = join(
+    downloadFolder,
+    "bangalore-bikes-historical-destinations.csv",
+  );
+  await waitFor(() => existsSync(csvPath), "filtered CSV download");
+  const exportedCsv = readFileSync(csvPath, "utf8");
+  assert.ok(
+    exportedCsv.includes("Nandi hills") && exportedCsv.includes("2010"),
+  );
+  assert.equal(
+    exportedCsv.split("\r\n").filter(Boolean).length,
+    2,
+    "Only the filtered record is exported",
+  );
+  await evaluate(`window.__previousDestinationDocument = true`);
+  await command("Page.reload");
+  await waitFor(
+    () =>
+      evaluate(
+        `!window.__previousDestinationDocument && document.querySelector('input[type=search]')?.value === 'Nandi' && document.querySelector('[role=status]')?.textContent.trim() === '1 of 109 destinations'`,
+      ),
+    "shared filters survive reload",
+  );
   await evaluate(
     `Array.from(document.querySelectorAll('button')).find(button => button.textContent === 'Reset destinations').click()`,
   );
@@ -365,6 +469,40 @@ try {
   );
   console.log(
     "PASS native handbook search and reading, section navigation, all 109 destinations, original columns, search/reset and intersecting filters",
+  );
+  await navigate("/destinations?q=not-a-match#place-5-nandi-hills");
+  await waitFor(
+    () =>
+      evaluate(`document.getElementById('place-5-nandi-hills')?.open === true`),
+    "shared destination record is revealed and expanded",
+  );
+  await navigate("/join");
+  await waitFor(
+    () => evaluate(`!!document.querySelector('#whatsapp-join-title')`),
+    "native join page",
+  );
+  assert.ok(
+    await evaluate(
+      `Array.from(document.querySelectorAll('main a')).some(a => a.href === 'https://chat.whatsapp.com/BtOk3R3w4FPK36zMy3UmQD')`,
+    ),
+  );
+  assert.ok(
+    await evaluate(
+      `!!document.querySelector('main img[src*="whatsapp-invite"]')`,
+    ),
+  );
+  assert.ok(
+    await evaluate(`document.documentElement.scrollWidth <= innerWidth + 1`),
+    "Join page mobile overflow",
+  );
+  await screenshot("join-mobile");
+  assert.equal(
+    (await fetch(new URL("/api/community-posts?sort=invalid", base))).status,
+    400,
+    "Unsupported feed sorts are rejected",
+  );
+  console.log(
+    "PASS shareable destination URLs, reload, filtered CSV download, expanded record links, and WhatsApp join/QR",
   );
 
   await command("Emulation.setDeviceMetricsOverride", {
@@ -399,6 +537,18 @@ try {
     "PASS desktop layout, modmail contact, unknown ride and calendar 404s",
   );
   if (process.argv.includes("--screenshots")) {
+    await navigate("/");
+    await waitFor(
+      () => evaluate(`!!document.querySelector('#community-posts-title')`),
+      "homepage preview",
+    );
+    await screenshot("home-community-desktop");
+    await navigate("/join");
+    await waitFor(
+      () => evaluate(`!!document.querySelector('#whatsapp-join-title')`),
+      "join desktop preview",
+    );
+    await screenshot("join-desktop");
     await navigate("/wiki");
     await waitFor(
       () => evaluate(`!!document.querySelector('#handbook-topics-title')`),

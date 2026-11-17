@@ -19,6 +19,9 @@ export const Footer = () => (
       <Link href="/wiki" className="underline underline-offset-4">
         Community handbook
       </Link>
+      <Link href="/join" className="underline underline-offset-4">
+        Join the community
+      </Link>
       <Link href="/destinations" className="underline underline-offset-4">
         Destinations
       </Link>

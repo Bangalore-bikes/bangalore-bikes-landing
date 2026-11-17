@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/sheet";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
-import { communityLinks } from "@/lib/community";
 
 interface MenuItem {
   title: string;
@@ -149,7 +148,7 @@ const Navbar = ({
               </NavigationMenu>
             </div>
             <Button asChild>
-              <a href={communityLinks.subreddit}>Join on Reddit</a>
+              <a href="/join">Join the community</a>
             </Button>
           </div>
         </nav>
@@ -216,7 +215,7 @@ const Navbar = ({
 
                   <div className="flex flex-col gap-3">
                     <Button asChild>
-                      <a href={communityLinks.subreddit}>Join on Reddit</a>
+                      <a href="/join">Join the community</a>
                     </Button>
                   </div>
                 </div>

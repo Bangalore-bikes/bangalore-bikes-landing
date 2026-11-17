@@ -22,6 +22,12 @@ export const publicPages = {
       "Contact the r/BangaloreBikes moderators through Reddit modmail for community questions, website corrections, and resource suggestions.",
     index: true,
   },
+  "/join": {
+    title: "Join Bangalore Bikes",
+    description:
+      "Join the Bangalore Bikes community through Reddit or the WhatsApp group. Scan the invitation QR code, download it, or open the invite on your phone.",
+    index: true,
+  },
   "/rides": {
     title: "Community rides",
     description:
@@ -43,14 +49,14 @@ export const publicPages = {
   "/maintenance": {
     title: "Motorcycle maintenance",
     description:
-      "Maintenance discussions for all motorcycle brands, with links to garage and roadside-help information for the Bangalore Bikes community.",
-    index: false,
+      "Prepare for a workshop visit, read an attributed community service experience, and find native ride-preparation and emergency-help guides.",
+    index: true,
   },
   "/maintenance/garages": {
-    title: "Garage recommendations",
+    title: "Workshop experiences",
     description:
-      "Ask r/BangaloreBikes about workshop experiences. No reviewed garage listings are currently published on the website.",
-    index: false,
+      "Read a source-attributed Bangalore Bikes member report about PFB Customs and questions to ask before booking a workshop visit.",
+    index: true,
   },
   "/maintenance/sos": {
     title: "Roadside help information",
