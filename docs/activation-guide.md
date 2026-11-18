@@ -190,8 +190,33 @@ database before either command. MFA enrollment is completed by the account owner
 under `/account/security`; do not mark it enabled before they prove possession.
 
 The active Vercel production alias is `https://bangalorebikes.vercel.app`.
-`bangalorebikes.com` is not attached to that project. Mail links must use the real
-attached origin until domain ownership/routing is configured.
+`bangalorebikes.com` is not attached to that project: the apex resolves to a
+parking provider, so nothing served there belongs to this site. Mail links must use
+the real attached origin, and `NEXT_PUBLIC_SITE_URL` also drives the canonical
+origin in the sitemap, robots, JSON-LD, Open Graph and RSS.
+
+### State on 18 November 2026
+
+Done, verified from this machine:
+
+- The free Turso Starter database is connected to the production project only.
+- `npm run db:migrate` and `npm run db:migrate:posts` ran against it; the tables and
+  the `posts_fts` index exist.
+- Brevo SMTP credentials, `MAIL_FROM`, `ADMIN_EMAILS`, `AUTH_ENCRYPTION_KEY` and
+  `NEXT_PUBLIC_SITE_URL` are saved for Production, and STARTTLS authentication
+  succeeds.
+- Production runs the community build: `/login`, `/posts` and
+  `/api/account/*` respond, and a wrong password answers `INVALID_CREDENTIALS`
+  rather than `503`, so the runtime can reach the database.
+- A verified moderator account exists for the owner. It has no known password by
+  design; the owner claims it with `/reset`.
+
+Still owner-only:
+
+- Claim the moderator account, enable authenticator MFA at `/account/security`,
+  and complete a real post through `/write` and `/moderation`.
+- Attach `bangalorebikes.com` to the project (or keep using the `vercel.app`
+  alias) and then set `NEXT_PUBLIC_SITE_URL` to whatever host is attached.
 
 The Resend instructions below remain an alternative, not the current setup.
 
@@ -252,7 +277,7 @@ database, and is inert until the steps below are done.
 - [ ] All seven server variables are saved with exact origins/callbacks; placeholder admins are replaced with real moderator logins.
 - [ ] Correct target databases are initialized; active hosts have been freshly deployed/redeployed.
 - [ ] `/admin` login works for moderators; unauthorized access is denied; CRUD, public visibility and persistence checks pass.
-- [ ] Community publishing: `RESEND_API_KEY`, `MAIL_FROM`, `ADMIN_EMAILS` and `NEXT_PUBLIC_SITE_URL` are saved; `npm run db:migrate:posts` ran against the intended database; confirmation mail arrives; a moderator can approve a post and see it public; a rider account is refused at `/moderation`.
+- [ ] Community publishing: `BREVO_SMTP_LOGIN`, `BREVO_SMTP_KEY`, `MAIL_FROM`, `ADMIN_EMAILS`, `AUTH_ENCRYPTION_KEY` and `NEXT_PUBLIC_SITE_URL` are saved; `npm run db:migrate:posts` ran against the intended database; confirmation mail arrives; a moderator can approve a post and see it public; a rider account is refused at `/moderation`.
 - [ ] Backup freshness/restore and subscription limits are checked. Only then label the feature **activated/deployed**.
 
 ## Direct setup links
