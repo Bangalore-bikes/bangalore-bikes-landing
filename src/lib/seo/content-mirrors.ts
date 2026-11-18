@@ -1,5 +1,17 @@
 import type { WikiGuide } from "../wiki.ts";
 import type { PostRow } from "../posts/repository.ts";
+import type { Destination } from "../wiki.ts";
+import {
+  cleanDirection,
+  destinationDays,
+  destinationDescription,
+  destinationKindLabel,
+  destinationMonths,
+  destinationPageTitle,
+  destinationPath,
+  destinationPlanningNotes,
+  destinationSummary,
+} from "../destinations.ts";
 
 /**
  * Plain-markdown mirrors exist so a language model can read one clean document
@@ -81,6 +93,51 @@ export function postMarkdown(post: PostRow, options: { origin: string }): string
   ].join("\n");
 }
 
+export function destinationCanonical(slug: string, origin: string): string {
+  return origin + destinationPath(slug);
+}
+
+export function destinationMarkdown(
+  destination: Destination,
+  slug: string,
+  options: { origin: string },
+): string {
+  const canonical = destinationCanonical(slug, options.origin);
+  const direction = cleanDirection(destination.cells[5] ?? "");
+  const facts: string[] = [
+    `- Type: ${destinationKindLabel(destination.kind)}`,
+    `- Distance from Bengaluru: ${
+      destination.distanceKm === null ? "not recorded" : `${destination.distanceKm} km`
+    }`,
+    `- Ride length: ${destinationDays(destination)}`,
+    `- Months: ${destinationMonths(destination)}`,
+  ];
+  if (direction) facts.push(`- Direction: ${direction}`);
+
+  return [
+    frontMatter([
+      ["title", destinationPageTitle(destination, slug)],
+      ["description", destinationDescription(destination)],
+      ["canonical", canonical],
+      ["type", "destination"],
+    ]),
+    `# ${destination.name}`,
+    "",
+    destinationSummary(destination),
+    "",
+    "## Facts",
+    "",
+    ...facts,
+    "",
+    "## Planning notes",
+    "",
+    ...destinationPlanningNotes(destination).map((note) => `- ${note}`),
+    "",
+    `Canonical: ${canonical}`,
+    "",
+  ].join("\n");
+}
+
 /** Paths a language model should read first, in the order they help most. */
 export function llmsTxt(options: {
   origin: string;
@@ -110,6 +167,7 @@ export function llmsTxt(options: {
     "",
     `- [Community handbook](${origin}/wiki): every guide in one place.`,
     `- [Destinations](${origin}/destinations): searchable archive of day-ride destinations with distances.`,
+    `- Destination pages: every archive record has its own page at ${origin}/destinations/<slug>.`,
     `- [Rider posts](${origin}/posts): ride reports and maintenance notes written by members.`,
     `- [Motorcycle maintenance](${origin}/maintenance): workshop notes and preparation checklists.`,
     `- [The community](${origin}/join): where the group meets and how to join.`,

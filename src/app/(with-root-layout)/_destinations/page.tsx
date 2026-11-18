@@ -1,10 +1,28 @@
 import Link from "next/link";
 import { DestinationDirectory } from "@/components/wiki/destination-directory";
 import { destinationArchive } from "@/data/wiki";
+import { destinationPath, destinationSlugIndex } from "@/lib/destinations";
+import { itemListJsonLd, jsonLdScript } from "@/lib/seo/jsonld";
 
 export default function DestinationsPage() {
+  const slugs = destinationSlugIndex(destinationArchive.rows);
   return (
     <main className="mx-auto w-full max-w-6xl space-y-9 px-2 py-10 sm:px-0 sm:py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdScript(
+            itemListJsonLd({
+              name: "Motorcycle destinations around Bengaluru",
+              path: "/destinations",
+              items: destinationArchive.rows.map((row) => ({
+                name: row.name,
+                path: destinationPath(slugs[row.id]),
+              })),
+            }),
+          ),
+        }}
+      />
       <header>
         <Link
           href="/wiki"
