@@ -1,0 +1,12 @@
+.git/
+.vercel/
+.env*
+node_modules/
+.next/
+.npm-cache/
+.npm-tmp/
+.bun-cache/
+storybook-static/
+coverage/
+*.tsbuildinfo
+*.log

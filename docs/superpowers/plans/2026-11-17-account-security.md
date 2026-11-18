@@ -40,7 +40,7 @@ existing auth session guards. Configure hosting and database through CLIs.
 5. [ ] Activation: configure Vercel secrets, create intended Turso database after
    provider authentication/terms, run migrations and provision the owner account.
    Verify SMTP and production deployment. Record any external blocker accurately.
-6. [ ] Run complete tests, lint, typecheck, build/SEO checks and a fresh focused
+6. [x] Run complete tests, lint, typecheck, build/SEO checks and a fresh focused
    security review; fix findings, push/link PR, deploy through Vercel CLI.
 
 ## Ledger
@@ -60,5 +60,12 @@ existing auth session guards. Configure hosting and database through CLIs.
   addressed to the owner. Inbox delivery has not been independently confirmed.
 - Fresh security review found two concurrency defects. Both were reproduced
   and fixed with interleaving tests; security tests are in the standard npm suite.
-- Production CLI deployment started. Turso provisioning and moderator account
+- Production CLI deployment is READY at https://bangalorebikes.vercel.app. Turso provisioning and moderator account
   creation still wait on owner-only Marketplace terms acceptance.
+
+- 2026-11-18: production login returns HTTP 200 with Google/GitHub coming-soon
+  controls. Account API returns 503 because no database has been provisioned.
+- Vercel dry-run confirms 249 source entries and excludes private environment
+  files, .vercel tooling and node_modules contents. Archive upload succeeded.
+- Retried Turso provisioning: integration_terms_acceptance_required remains.
+  Native Turso CLI also has no authenticated account. Owner action is required.
