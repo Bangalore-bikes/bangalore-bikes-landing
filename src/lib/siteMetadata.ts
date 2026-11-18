@@ -55,9 +55,9 @@ export const publicPages = {
     index: true,
   },
   "/destinations": {
-    title: "Riding destinations",
+    title: "Riding destinations near Bengaluru",
     description:
-      "Browse the community wiki's historical destination collection. Search places by name, type and listed distance, and read the original source records on the website.",
+      "Day-ride destinations around Bengaluru from the community wiki: search hills, waterfalls and heritage sites by name and listed distance.",
     index: true,
   },
   "/maintenance": {
