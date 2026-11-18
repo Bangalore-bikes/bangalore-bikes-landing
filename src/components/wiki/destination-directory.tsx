@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useId, useMemo, useState } from "react";
+import Link from "next/link";
 import type { Destination } from "@/lib/wiki";
+import {
+  destinationPath,
+  destinationSlugIndex,
+} from "@/lib/destinations";
 import { filterDestinations } from "@/lib/destinationSearch";
 import {
   createDestinationCsv,
@@ -30,6 +35,7 @@ export function DestinationDirectory({
   const [feedback, setFeedback] = useState("");
   const [manualLink, setManualLink] = useState("");
   const results = filterDestinations(entries, query, kind, distance);
+  const slugs = useMemo(() => destinationSlugIndex(entries), [entries]);
   const kinds = useMemo(
     () => [...new Set(entries.map((entry) => entry.kind))].sort(),
     [entries],
@@ -252,6 +258,12 @@ export function DestinationDirectory({
               </span>
             </summary>
             <div className="pb-7 pl-5 sm:pl-7">
+              <Link
+                href={destinationPath(slugs[entry.id])}
+                className="mb-4 inline-flex min-h-11 items-center font-medium underline underline-offset-4"
+              >
+                Open the {entry.name} page
+              </Link>
               <p className="mb-4 text-sm text-muted-foreground">
                 Historical record from{" "}
                 {entry.source === "wiki"

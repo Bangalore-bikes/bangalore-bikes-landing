@@ -1,6 +1,11 @@
 import type { MetadataRoute } from "next";
 
-import { wikiGuides } from "@/data/wiki";
+import { destinationArchive, wikiGuides } from "@/data/wiki";
+import {
+  destinationIsIndexable,
+  destinationPath,
+  destinationSlugIndex,
+} from "@/lib/destinations";
 import { getArticles, getRides } from "@/lib/content-source";
 import { getPostsClient, hasDatabaseConfig } from "@/lib/db";
 import { listPublished, type PostRow } from "@/lib/posts/repository";
@@ -32,6 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const writers = [
     ...new Set(posts.map((post) => post.author?.handle).filter(Boolean)),
   ];
+  const slugs = destinationSlugIndex(destinationArchive.rows);
 
   const pages = Object.entries(publicPages)
     .filter(([path, page]) =>
@@ -47,6 +53,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...pages,
     ...wikiGuides.map((guide) => ({ url: siteOrigin + "/wiki/" + guide.slug })),
+    ...destinationArchive.rows
+      .filter(destinationIsIndexable)
+      .map((row) => ({
+        url: siteOrigin + destinationPath(slugs[row.id]),
+      })),
     ...articles.map((article) => ({
       url: siteOrigin + "/blogs/" + article.slug,
       lastModified: article.updatedAt,
