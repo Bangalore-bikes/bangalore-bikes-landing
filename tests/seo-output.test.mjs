@@ -69,11 +69,12 @@ test("every public page has its own title, canonical URL, and social preview", (
       html.includes('name="twitter:card" content="summary_large_image"'),
       route + " social card missing",
     );
-    assert.ok(
-      html.includes(
-        'property="og:image" content="' + origin + '/hero-banner.png"',
-      ),
-      route + " preview image missing",
+    const image = html.match(/property="og:image" content="([^"]+)"/)?.[1];
+    assert.ok(image, route + " preview image missing");
+    assert.equal(
+      new URL(image).origin,
+      origin,
+      route + " preview image is served from another host",
     );
   }
 });

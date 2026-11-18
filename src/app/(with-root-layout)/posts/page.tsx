@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { getPostsClient, hasDatabaseConfig } from "@/lib/db";
 import { tagLabel } from "@/lib/posts/format";
 import { listPublished } from "@/lib/posts/repository";
+import { itemListJsonLd, jsonLdScript } from "@/lib/seo/jsonld";
 import {
   createPageMetadata,
   isPreviewDeployment,
@@ -68,6 +69,23 @@ export default async function PostsPage({
 
   return (
     <main className="space-y-10 py-12 sm:py-16">
+      {page === 1 && !tag && posts.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: jsonLdScript(
+              itemListJsonLd({
+                name: "Rider posts",
+                path: "/posts",
+                items: posts.map((post) => ({
+                  name: post.title,
+                  path: `/posts/${post.slug}`,
+                })),
+              }),
+            ),
+          }}
+        />
+      )}
       <header className="space-y-4">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
           Written by riders

@@ -6,6 +6,7 @@ import { Navbar } from "@/components/common/navbar";
 import { Footer } from "@/components/common/footer";
 import { ViewTransitions } from "next-view-transitions";
 import { siteName, siteOrigin } from "@/lib/siteMetadata";
+import { jsonLdScript, organizationJsonLd, websiteJsonLd } from "@/lib/seo/jsonld";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -41,6 +42,12 @@ export default function RootLayout({
         <body
           className={`${spaceGrotesk.className} ${spaceGrotesk.variable} ${newsreader.variable} antialiased`}
         >
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: jsonLdScript([organizationJsonLd(), websiteJsonLd()]),
+            }}
+          />
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

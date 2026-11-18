@@ -12,6 +12,7 @@ import {
   breadcrumbJsonLd,
   jsonLdScript,
 } from "@/lib/seo/post-jsonld";
+import { ogImageUrl } from "@/lib/seo/og";
 import { isPreviewDeployment, siteName, siteOrigin } from "@/lib/siteMetadata";
 
 export const revalidate = 60;
@@ -42,11 +43,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: "Post not found", robots: { index: false } };
 
   const url = `${siteOrigin}/posts/${post.slug}`;
-  const image = post.coverImageUrl ?? `${siteOrigin}/hero-banner.png`;
+  const image =
+    post.coverImageUrl ??
+    ogImageUrl({
+      title: post.title,
+      subtitle: post.summary,
+      kind: "Rider post",
+    });
   return {
     title: post.title,
     description: post.summary.slice(0, 160),
-    alternates: { canonical: url },
+    alternates: {
+      canonical: url,
+      types: { "text/markdown": `${siteOrigin}/md/posts/${post.slug}` },
+    },
     authors: post.author ? [{ name: post.author.displayName }] : undefined,
     robots: { index: !isPreviewDeployment, follow: true },
     openGraph: {
