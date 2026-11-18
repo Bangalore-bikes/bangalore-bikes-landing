@@ -30,6 +30,8 @@ Resource drafts are omitted from the website; they are not private repository st
 
 Moderators can also manage the same collections in the browser at `/admin` once the managed database and GitHub sign-in are configured. See [managed content admin](./docs/content-admin.md) and the [activation guide](./docs/activation-guide.md). Repository JSON stays the fallback when no database is configured.
 
+Riders can publish their own posts. Any account can write in Markdown, first posts are reviewed, and trusted authors publish immediately. See [community publishing](./docs/community-blogging.md) for the trust rules, the directive reference and the environment variables that switch it on.
+
 See [article publishing](./docs/articles.md) for structured content, attribution, and publication requirements.
 
 With Node 22.18+:

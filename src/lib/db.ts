@@ -1,7 +1,7 @@
 import { createClient } from "@libsql/client";
 
-import { createContentStore, type ContentStore } from "./content-store";
-import { toStoreClient, type RemoteClient } from "./sql-client";
+import { createContentStore, type ContentStore, type SqlClient } from "./content-store.ts";
+import { toStoreClient, type RemoteClient } from "./sql-client.ts";
 
 let cachedClient: RemoteClient | null = null;
 let cachedStore: ContentStore | null = null;
@@ -44,6 +44,14 @@ export function getContentStore(): ContentStore {
   if (cachedStore) return cachedStore;
   cachedStore = createContentStore(toStoreClient(getRemoteClient()));
   return cachedStore;
+}
+
+/**
+ * The community tables live in the same libSQL database as the managed content.
+ * Nothing here reads `content_records`, so the two features stay independent.
+ */
+export function getPostsClient(): SqlClient {
+  return toStoreClient(getRemoteClient());
 }
 
 /** Test helper: drop the module-level client so a new URL takes effect. */

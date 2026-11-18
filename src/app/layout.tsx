@@ -1,7 +1,7 @@
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
 import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
+import { Newsreader, Space_Grotesk } from "next/font/google";
 import { Navbar } from "@/components/common/navbar";
 import { Footer } from "@/components/common/footer";
 import { ViewTransitions } from "next-view-transitions";
@@ -9,6 +9,16 @@ import { siteName, siteOrigin } from "@/lib/siteMetadata";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
+  variable: "--font-space-grotesk",
+});
+
+/**
+ * One reading serif for post bodies only. UI and display stay in Space Grotesk,
+ * so the editorial pages feel different without a second visual language.
+ */
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  variable: "--font-newsreader",
 });
 
 export const metadata: Metadata = {
@@ -28,7 +38,9 @@ export default function RootLayout({
   return (
     <ViewTransitions>
       <html lang="en" suppressHydrationWarning>
-        <body className={`${spaceGrotesk.className} antialiased`}>
+        <body
+          className={`${spaceGrotesk.className} ${spaceGrotesk.variable} ${newsreader.variable} antialiased`}
+        >
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

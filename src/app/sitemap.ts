@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 
 import { wikiGuides } from "@/data/wiki";
 import { getArticles, getRides } from "@/lib/content-source";
+import { getPostsClient, hasDatabaseConfig } from "@/lib/db";
+import { listPublished, type PostRow } from "@/lib/posts/repository";
 import {
   isPreviewDeployment,
   publicPages,
@@ -11,13 +13,35 @@ import {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (isPreviewDeployment) return [];
   const [articles, rides] = await Promise.all([getArticles(), getRides()]);
+
+  // The community database is optional; an unconfigured deployment simply has
+  // no rider posts to list.
+  const posts: PostRow[] = [];
+  if (hasDatabaseConfig()) {
+    try {
+      const client = getPostsClient();
+      for (let offset = 0; ; offset += 100) {
+        const page = await listPublished(client, { limit: 100, offset });
+        posts.push(...page);
+        if (page.length < 100) break;
+      }
+    } catch {
+      posts.length = 0;
+    }
+  }
+  const writers = [
+    ...new Set(posts.map((post) => post.author?.handle).filter(Boolean)),
+  ];
+
   const pages = Object.entries(publicPages)
     .filter(([path, page]) =>
       path === "/blogs"
         ? articles.length > 0
         : path === "/rides"
           ? rides.length > 0
-          : page.index,
+          : path === "/posts"
+            ? posts.length > 0
+            : page.index,
     )
     .map(([path]) => ({ url: siteOrigin + path }));
   return [
@@ -33,5 +57,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: siteOrigin + "/rides/" + ride.slug,
         lastModified: ride.updatedAt,
       })),
+    ...posts.map((post) => ({
+      url: siteOrigin + "/posts/" + post.slug,
+      lastModified: post.updatedAt,
+    })),
+    ...writers.map((handle) => ({ url: siteOrigin + "/writers/" + handle })),
   ];
 }

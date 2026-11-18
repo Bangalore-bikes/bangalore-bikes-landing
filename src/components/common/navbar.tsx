@@ -73,6 +73,10 @@ const Navbar = ({
       url: "/blogs",
     },
     {
+      title: "Rider posts",
+      url: "/posts",
+    },
+    {
       title: "Destinations",
       url: "/destinations",
     },
