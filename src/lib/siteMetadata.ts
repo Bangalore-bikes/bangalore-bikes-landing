@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 
-export const siteOrigin = "https://bangalorebikes.com";
+/**
+ * Canonical origin for URLs the site emits itself (sitemap, robots, JSON-LD,
+ * Open Graph, RSS). It follows NEXT_PUBLIC_SITE_URL so a deployment never
+ * advertises a host that is not serving this site; the apex domain is only the
+ * fallback for local builds without the variable.
+ */
+export const siteOrigin =
+  process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "") ||
+  "https://bangalorebikes.com";
 export const siteName = "Bangalore Bikes";
 
 export const publicPages = {
