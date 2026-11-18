@@ -6,6 +6,7 @@ import { mailer } from "@/lib/mail";
 import { moderationMail } from "@/lib/mail/templates";
 import { revalidatePost } from "@/lib/posts/revalidate";
 import { moderatePost, type ModerationAction } from "@/lib/posts/repository";
+import { submitUrls } from "@/lib/seo/indexnow";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -48,6 +49,12 @@ export async function POST(request: Request, context: Context) {
       note: typeof body.note === "string" ? body.note : null,
     });
     revalidatePost(post.slug);
+    if (post.status === "published") {
+      await submitUrls([
+        `${siteOrigin(request)}/posts/${post.slug}`,
+        `${siteOrigin(request)}/posts`,
+      ]);
+    }
 
     // Best effort: the decision stands even if the notification cannot be sent.
     const author = await findUserById(client, post.authorId);

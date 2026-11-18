@@ -5,6 +5,7 @@ import { ResourceDirectory } from "@/components/common/resource-directory";
 import { WikiDirectory } from "@/components/wiki/wiki-directory";
 import { destinationArchive, wikiGuides } from "@/data/wiki";
 import { getCommunityResources } from "@/lib/content-source";
+import { itemListJsonLd, jsonLdScript } from "@/lib/seo/jsonld";
 
 export const revalidate = 60;
 
@@ -12,6 +13,21 @@ export default async function WikiPage() {
   const communityResources = await getCommunityResources();
   return (
     <main className="mx-auto w-full max-w-6xl space-y-14 px-2 py-10 sm:space-y-20 sm:px-0 sm:py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdScript(
+            itemListJsonLd({
+              name: "Bangalore Bikes community handbook",
+              path: "/wiki",
+              items: wikiGuides.map((guide) => ({
+                name: guide.title,
+                path: `/wiki/${guide.slug}`,
+              })),
+            }),
+          ),
+        }}
+      />
       <header className="grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-end">
         <div>
           <h1 className="max-w-3xl text-4xl font-bold leading-tight tracking-tight sm:text-5xl">

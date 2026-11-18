@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { wikiGuides } from "@/data/wiki";
+import { wikiGuides, wikiImportedOn } from "@/data/wiki";
+import {
+  breadcrumbJsonLd,
+  guideArticleJsonLd,
+  jsonLdScript,
+} from "@/lib/seo/jsonld";
+import { ogImageUrl } from "@/lib/seo/og";
 import {
   createPageMetadata,
   siteOrigin,
@@ -28,7 +34,10 @@ export async function generateMetadata({
     ...base,
     title: { absolute: title },
     description: guide.summary,
-    alternates: { canonical: url },
+    alternates: {
+      canonical: url,
+      types: { "text/markdown": siteOrigin + "/md/wiki/" + slug },
+    },
     robots: { index: !isPreviewDeployment, follow: true },
     openGraph: {
       ...base.openGraph,
@@ -36,8 +45,29 @@ export async function generateMetadata({
       description: guide.summary,
       url,
       type: "article",
+      images: [
+        {
+          url: ogImageUrl({
+            title: guide.title,
+            subtitle: guide.summary,
+            kind: "Community handbook",
+          }),
+          alt: guide.title,
+        },
+      ],
     },
-    twitter: { ...base.twitter, title, description: guide.summary },
+    twitter: {
+      ...base.twitter,
+      title,
+      description: guide.summary,
+      images: [
+        ogImageUrl({
+          title: guide.title,
+          subtitle: guide.summary,
+          kind: "Community handbook",
+        }),
+      ],
+    },
   };
 }
 
@@ -51,6 +81,19 @@ export default async function WikiGuidePage({
   if (!guide) notFound();
   return (
     <main className="mx-auto w-full max-w-6xl px-2 py-10 sm:px-0 sm:py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdScript([
+            guideArticleJsonLd(guide, { dateModified: wikiImportedOn }),
+            breadcrumbJsonLd([
+              { name: "Home", path: "/" },
+              { name: "Community handbook", path: "/wiki" },
+              { name: guide.title, path: `/wiki/${guide.slug}` },
+            ]),
+          ]),
+        }}
+      />
       <Link
         href="/wiki"
         className="inline-flex min-h-11 items-center text-sm underline underline-offset-4"
