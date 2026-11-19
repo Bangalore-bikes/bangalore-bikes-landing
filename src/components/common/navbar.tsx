@@ -126,11 +126,11 @@ const Navbar = ({
         isVisible || mobileMenuOpen ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      <div className="w-full lg:max-w-9/12 mx-auto">
+      <div className="w-full xl:max-w-7xl mx-auto">
         {/* Desktop Menu */}
-        <nav aria-label="Primary" className="hidden justify-between lg:flex">
+        <nav aria-label="Primary" className="hidden justify-between xl:flex">
           {/* Logo */}
-          <Link href={logo.url} className="flex items-center gap-4">
+          <Link href={logo.url} className="flex shrink-0 items-center gap-3 whitespace-nowrap">
             <Image
               src={logo.src}
               className="max-h-8 rounded-full"
@@ -143,7 +143,7 @@ const Navbar = ({
               {logo.title}
             </span>
           </Link>
-          <div className="flex justify-end items-center gap-6">
+          <div className="flex items-center justify-end gap-3">
             <div className="flex items-center">
               <NavigationMenu>
                 <NavigationMenuList>
@@ -164,7 +164,7 @@ const Navbar = ({
         </nav>
 
         {/* Mobile Menu */}
-        <div className="block lg:hidden">
+        <div className="block xl:hidden">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link href={logo.url} className="flex items-center gap-2">

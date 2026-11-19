@@ -38,7 +38,7 @@ export default function Home() {
       </noscript>
       <HomeHero
         stats={[
-          { label: "Destinations", value: pickerItems.length },
+          { label: "Destinations", value: destinationArchive.rows.length },
           { label: "Guides", value: wikiGuides.length },
         ]}
       />
@@ -51,7 +51,7 @@ export default function Home() {
             Set how far you want to go and when. We filter the community&apos;s destination
             record for you.
           </p>
-          <RidePicker items={pickerItems} />
+          <RidePicker items={pickerItems} total={destinationArchive.rows.length} />
         </div>
       </Reveal>
 

@@ -169,8 +169,20 @@ short and long windows, expiry cleanup and Retry-After responses.
 | PUT | `/api/posts/[id]` | author | requires `expectedVersion` |
 | POST | `/api/posts/[id]/submit` | author | `{ expectedVersion, publish }` |
 | POST | `/api/posts/preview` | rider | renders Markdown, stores nothing |
+| GET | `/api/posts/[id]/comments` | none | published comments plus the viewer (`null` when signed out) |
+| POST | `/api/posts/[id]/comments` | rider | `{ body }`, plain text up to 1000 characters, 10 per hour |
+| DELETE | `/api/posts/[id]/comments?commentId=` | author or moderator | soft delete |
 | POST | `/api/moderation/[id]` | moderator | `{ action, note, expectedVersion }` |
 | GET/POST | `/api/account/security` | session | account security status and authenticated changes |
+
+### Comments
+
+Signed-in riders can comment on published posts. Comments are plain text, stored in
+`post_comments` and rendered as text, so there is no HTML to sanitise. They publish
+immediately; a moderator can remove any comment and an author their own. Comments
+from disabled accounts are hidden. The post page is cached, so comments load from the
+API in the browser. Logic and tests: `src/lib/posts/comments.ts`,
+`tests/post-comments.test.mjs`.
 
 ### Account security
 
