@@ -245,3 +245,17 @@ export function relatedDestinations(
   };
   return [...candidates].sort((a, b) => score(a) - score(b) || a.name.localeCompare(b.name)).slice(0, limit);
 }
+
+export const MONTH_NAMES = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+] as const;
+
+/** Which of the 12 months fall inside the source's from/to range. Wraps over the year end. */
+export function monthsInSeason(destination: Destination): boolean[] | null {
+  const from = MONTH_NAMES.indexOf(destination.cells[15]?.trim() as never);
+  const to = MONTH_NAMES.indexOf(destination.cells[16]?.trim() as never);
+  if (from === -1 || to === -1) return null;
+  return MONTH_NAMES.map((_, month) =>
+    from <= to ? month >= from && month <= to : month >= from || month <= to,
+  );
+}

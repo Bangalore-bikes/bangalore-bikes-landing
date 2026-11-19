@@ -102,27 +102,48 @@ export function RideDirectory({
             {!upcomingOnly && (
               <h2 className="mb-4 text-2xl font-semibold">{group.label}</h2>
             )}
-            <ul className="divide-y divide-border">
-              {matches.map((ride) => (
-                <li key={ride.slug} className="space-y-3 py-5">
-                  <h3 className="text-xl font-semibold">
+            <ul className="grid gap-4 md:grid-cols-2">
+              {matches.map((ride) => {
+                const start = new Date(ride.startsAt);
+                const day = new Intl.DateTimeFormat("en-IN", {
+                  day: "numeric",
+                  timeZone: "Asia/Kolkata",
+                }).format(start);
+                const month = new Intl.DateTimeFormat("en-IN", {
+                  month: "short",
+                  timeZone: "Asia/Kolkata",
+                }).format(start);
+                return (
+                  <li key={ride.slug}>
                     <Link
-                      className="underline underline-offset-4"
                       href={"/rides/" + ride.slug}
+                      className="lift group flex h-full gap-4 rounded-xl border border-border bg-card p-5"
                     >
-                      {ride.title}
+                      <span
+                        aria-hidden="true"
+                        className="flex size-16 shrink-0 flex-col items-center justify-center rounded-lg bg-dixie text-black"
+                      >
+                        <span className="text-2xl font-bold leading-none">{day}</span>
+                        <span className="mt-1 text-xs font-medium uppercase">{month}</span>
+                      </span>
+                      <span className="min-w-0 space-y-1">
+                        <span className="block text-lg font-semibold leading-snug underline-offset-4 group-hover:underline">
+                          {ride.title}
+                        </span>
+                        <span className="block text-sm">{formatRideDate(ride.startsAt)}</span>
+                        <span className="block text-sm text-muted-foreground">
+                          {ride.meetingPoint} to {ride.destination} · {ride.distanceKm} km
+                        </span>
+                        {ride.status === "cancelled" && (
+                          <span className="block text-sm">
+                            Cancelled: {ride.cancellationReason}
+                          </span>
+                        )}
+                      </span>
                     </Link>
-                  </h3>
-                  <p>{formatRideDate(ride.startsAt)}</p>
-                  <p className="text-muted-foreground">
-                    {ride.meetingPoint} to {ride.destination} ·{" "}
-                    {ride.distanceKm} km
-                  </p>
-                  {ride.status === "cancelled" && (
-                    <p>Cancelled: {ride.cancellationReason}</p>
-                  )}
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           </section>
         );

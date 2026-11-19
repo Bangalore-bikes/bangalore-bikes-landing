@@ -396,16 +396,15 @@ try {
     ),
     "Historical age notice",
   );
-  await evaluate(
-    `Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(document.querySelector('input[type=search]'), 'Nandi'); document.querySelector('input[type=search]').dispatchEvent(new Event('input', {bubbles:true}))`,
-  );
-  await waitFor(
-    () =>
-      evaluate(
-        `document.querySelector('[role=status]').textContent.trim() === '1 of 109 destinations'`,
-      ),
-    "destination name search",
-  );
+  // Re-send the input on every poll: the first event can land before hydration.
+  await waitFor(async () => {
+    await evaluate(
+      `Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(document.querySelector('input[type=search]'), 'Nandi'); document.querySelector('input[type=search]').dispatchEvent(new Event('input', {bubbles:true}))`,
+    );
+    return evaluate(
+      `document.querySelector('[role=status]').textContent.trim() === '1 of 109 destinations'`,
+    );
+  }, "destination name search");
   await evaluate(`document.querySelector('details summary').click()`);
   assert.equal(
     await evaluate(`document.querySelectorAll('details[open] dl dd').length`),
