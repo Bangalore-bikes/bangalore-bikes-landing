@@ -462,3 +462,18 @@
     animation: none;
   }
 }
+
+.bar-fill {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
+}
+.reveal[data-shown="true"] .bar-fill {
+  transform: scaleX(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .bar-fill {
+    transform: none;
+    transition: none;
+  }
+}

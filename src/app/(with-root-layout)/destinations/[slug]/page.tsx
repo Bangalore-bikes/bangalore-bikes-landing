@@ -10,6 +10,7 @@ import {
   destinationIsIndexable,
   destinationKindLabel,
   destinationMonths,
+  monthsInSeason,
   destinationPageTitle,
   destinationPath,
   destinationPlanningNotes,
@@ -17,6 +18,7 @@ import {
   nearbyReferences,
   relatedDestinations,
 } from "@/lib/destinations";
+import { DestinationHighlights } from "@/components/destinations/destination-highlights";
 import {
   breadcrumbJsonLd,
   destinationJsonLd,
@@ -168,6 +170,12 @@ export default async function DestinationPage({ params }: Props) {
           {intro}
         </p>
       </header>
+
+      <DestinationHighlights
+        km={destination.distanceKm}
+        days={days}
+        season={monthsInSeason(destination)}
+      />
 
       <aside
         aria-label="Historical source notice"
