@@ -10,7 +10,7 @@ import type { PostRow } from "@/lib/posts/repository";
 export function PostCard({ post, priority = false }: { post: PostRow; priority?: boolean }) {
   const author = post.author;
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-xl border bg-card transition-shadow duration-300 hover:shadow-lg">
+    <article className="group flex h-full flex-col overflow-hidden rounded-xl border bg-card lift transition-shadow duration-300 hover:shadow-lg">
       <Link
         href={`/posts/${post.slug}`}
         className="flex h-full flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"

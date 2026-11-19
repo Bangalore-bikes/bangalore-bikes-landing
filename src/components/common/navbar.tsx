@@ -9,6 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { AccountLinks, AccountMenu } from "@/components/common/account-menu";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -151,12 +152,7 @@ const Navbar = ({
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
-            <Button asChild variant="ghost">
-              <Link href="/login">Log in</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/write">Write</Link>
-            </Button>
+            <AccountMenu />
             <Button asChild>
               <a href="/join">Join the community</a>
             </Button>
@@ -224,12 +220,7 @@ const Navbar = ({
                   </Accordion>
 
                   <div className="flex flex-col gap-3">
-                    <Button asChild variant="outline">
-                      <Link href="/login">Log in</Link>
-                    </Button>
-                    <Button asChild variant="outline">
-                      <Link href="/write">Write a post</Link>
-                    </Button>
+                    <AccountLinks />
                     <Button asChild>
                       <a href="/join">Join the community</a>
                     </Button>
