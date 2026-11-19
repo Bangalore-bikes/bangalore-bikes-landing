@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { PostBody } from "@/components/posts/post-body";
 import { PostCard } from "@/components/posts/post-card";
+import { PostComments } from "@/components/posts/post-comments";
 import { getPostsClient, hasDatabaseConfig } from "@/lib/db";
 import { formatDate, readingMinutes, tagLabel } from "@/lib/posts/format";
 import { getPostBySlug, listPublished } from "@/lib/posts/repository";
@@ -179,6 +180,8 @@ export default async function PostPage({ params }: Props) {
         </div>
 
         <PostBody html={post.bodyHtml ?? ""} />
+
+        <PostComments postId={post.id} slug={post.slug} />
 
         {author && (
           <aside className="mt-12 flex flex-wrap items-start gap-4 rounded-xl border bg-card p-6">

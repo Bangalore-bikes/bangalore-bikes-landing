@@ -29,7 +29,13 @@ function inSeason(item: PickerDestination, month: number): boolean {
 }
 
 /** Filters the 2010 destination record by distance, month and type. Not current advice. */
-export function RidePicker({ items }: { items: PickerDestination[] }) {
+export function RidePicker({
+  items,
+  total,
+}: {
+  items: PickerDestination[];
+  total: number;
+}) {
   const [maxIndex, setMaxIndex] = useState(1);
   const [month, setMonth] = useState(() => new Date().getMonth());
   const [kind, setKind] = useState("all");
@@ -143,7 +149,7 @@ export function RidePicker({ items }: { items: PickerDestination[] }) {
         href="/destinations"
         className="mt-6 inline-flex min-h-11 items-center gap-2 font-medium underline underline-offset-4"
       >
-        Browse all {items.length} destinations
+        Browse all {total} destinations
       </Link>
     </div>
   );

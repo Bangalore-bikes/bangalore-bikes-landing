@@ -87,7 +87,25 @@ test("unfinished pages are noindex and sitemap contains only populated routes", 
   const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
     (match) => match[1],
   );
-  assert.deepEqual(urls.sort(), indexed.map((route) => origin + route).sort());
+  const detailPrefix = origin + "/destinations/";
+  const detailUrls = urls.filter((url) => url.startsWith(detailPrefix));
+  assert.ok(
+    detailUrls.length > 100,
+    "sitemap should list the per-destination pages",
+  );
+  for (const url of detailUrls) {
+    const slug = url.slice(detailPrefix.length);
+    assert.match(slug, /^[a-z0-9]+(-[a-z0-9]+)*$/, slug + " is not a clean slug");
+    const page = htmlFor("/destinations/" + slug);
+    assert.ok(
+      page.includes('rel="canonical" href="' + url + '"'),
+      slug + " canonical mismatch",
+    );
+  }
+  assert.deepEqual(
+    urls.filter((url) => !url.startsWith(detailPrefix)).sort(),
+    indexed.map((route) => origin + route).sort(),
+  );
   for (const route of routes.filter((route) => !indexed.includes(route))) {
     assert.ok(
       htmlFor(route).includes('name="robots" content="noindex, follow"'),
